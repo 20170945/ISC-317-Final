@@ -5,7 +5,7 @@ from pyswip import Prolog
 from Grafo import dijkstra
 from collections import defaultdict
 from itertools import permutations
-from ventana import VentaPrincial
+from visual.VentaPrincipal import VentaPrincial
 
 prolog = None
 
