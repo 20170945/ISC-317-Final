@@ -2,18 +2,12 @@
 import time
 
 from pyswip import Prolog
-from tkinter import *
 from Grafo import dijkstra
 from collections import defaultdict
 from itertools import permutations
+from ventana import VentaPrincial
 
 prolog = None
-
-def main():
-    ventana = Tk()
-    ventana.title("Planeamiento de Rutas")
-    ventana.minsize(800, 600)
-    ventana.mainloop()
 
 def init():
     global prolog
@@ -36,4 +30,4 @@ def init():
 # el __name__ como __main__
 if __name__ == "__main__":
     init()
-    main()
+    principal = VentaPrincial(prolog)
