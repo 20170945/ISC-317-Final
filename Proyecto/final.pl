@@ -93,12 +93,10 @@ arista(santo_domingo, la_vega, 128).
 % definiendo la bidirecionaliodad de las arista, ya que es un grafo bidirecional
 biarista(X,Y,D):-arista(X,Y,D);arista(Y,X,D).
 % caminos compuestos, camino(Desde, Hasta, Camino, Peso)
-:-dynamic camino/4.
-% Obtener la ruta planificada.
-plan(Visitar,L):-findall([Y,X],(permutation(Visitar,X), calcular(X,Y)),L).
-calcular([Y],0).
-calcular([H,N|T],D):-camino(H,N,_,Peso), calcular([N|T],D2), D is D2+Peso.
-
+:-dynamic ciudad/1.
+registrar([]).
+registrar([H|T]):-assertz(ciudad(H)), registrar(T).
+:- setof(X,Y^F^biarista(X,Y,F),L), registrar(L).
 
 showall([]).
 showall([H|T]):-write(H),nl,showall(T).
