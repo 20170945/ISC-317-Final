@@ -71,33 +71,3 @@ playa("playa de los muertos", rio_san_juan).
 % actividad\5 es nombre, lugar, tipo, costo, fecha con formato de date(Ano, Mes, Dia).
 actividad(X,Y, playa,0, date(_,_,_)):-playa(X,Y).
 actividad("el carnaval",la_vega, celebración,0, date(_,2,27)).
-
-/* grafo de las localizaciones */
-:- dynamic arista/3.
-arista(samana, santo_domingo_este, 168).
-arista(romana, santo_domingo_este, 112).
-arista(santo_domingo, santo_domingo_este, 14).
-arista(samana, romana, 238).
-arista(samana, rio_san_juan, 127).
-arista(romana, punta_cana, 78).
-arista(romana, bayahibe, 26).
-arista(punta_cana, bayahibe, 69).
-arista(macao, bayahibe, 69).
-arista(uvero_alto, bayahibe, 69).
-arista(punta_cana, bavaro, 19).
-arista(bavaro, macao, 13).
-arista(samana, macao, 336).
-arista(macao, uvero_alto, 10).
-arista(puerto_plata, rio_san_juan, 89).
-arista(puerto_plata, santiago, 60).
-arista(romana, rio_san_juan, 263).
-arista(rio_san_juan,santo_domingo_este,194).
-arista(rio_san_juan,santiago , 106).
-arista(santiago, la_vega, 38).
-arista(santo_domingo, la_vega, 128).
-% definiendo la bidirecionaliodad de las arista, ya que es un grafo bidirecional
-biarista(X,Y,D):-arista(X,Y,D);arista(Y,X,D).
-% caminos compuestos, camino(Desde, Hasta, Camino, Peso)
-
-showall([]).
-showall([H|T]):-write(H),nl,showall(T).
