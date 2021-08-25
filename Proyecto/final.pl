@@ -67,6 +67,11 @@ playa("playa caleton", rio_san_juan).
 playa("playa de los minos", rio_san_juan).
 playa("playa de los muertos", rio_san_juan).
 
+
+% actividad\5 es nombre, lugar, tipo, costo, fecha con formato de date(Ano, Mes, Dia).
+actividad(X,Y, playa,0, date(_,_,_)):-playa(X,Y).
+actividad("el carnaval",la_vega, celebración,0, date(_,2,27)).
+
 /* grafo de las localizaciones */
 :- dynamic arista/3.
 arista(samana, santo_domingo_este, 168).
@@ -93,10 +98,6 @@ arista(santo_domingo, la_vega, 128).
 % definiendo la bidirecionaliodad de las arista, ya que es un grafo bidirecional
 biarista(X,Y,D):-arista(X,Y,D);arista(Y,X,D).
 % caminos compuestos, camino(Desde, Hasta, Camino, Peso)
-:-dynamic ciudad/1.
-registrar([]).
-registrar([H|T]):-assertz(ciudad(H)), registrar(T).
-:- setof(X,Y^F^biarista(X,Y,F),L), registrar(L).
 
 showall([]).
 showall([H|T]):-write(H),nl,showall(T).

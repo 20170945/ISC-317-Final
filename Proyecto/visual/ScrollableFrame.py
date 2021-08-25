@@ -5,7 +5,7 @@ from tkinter import ttk
 class ScrollableFrame(ttk.Frame):  # https://blog.teclado.com/tkinter-scrollable-frames/
     def __init__(self, container, horizontal_s=False, vertical_s=True, *args, **kwargs):
         super().__init__(container, *args, **kwargs)
-        self.__canvas = Canvas(self)
+        self.__canvas = Canvas(self, width=1)
         self.scrollable_frame = Frame(self.__canvas)
         self.scrollable_frame.bind(
             "<Configure>",
@@ -18,7 +18,6 @@ class ScrollableFrame(ttk.Frame):  # https://blog.teclado.com/tkinter-scrollable
 
         self.__canvas.bind(
             "<Configure>", self.__canvas_resize
-
         )
 
         if horizontal_s:
