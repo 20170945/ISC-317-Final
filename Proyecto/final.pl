@@ -8,7 +8,7 @@ playa("Playa Rincón",samana).
 playa("Playa Frontón",samana).
 playa("Playa Madama",samana).
 playa("Cayo Levantado",samana).
-playa("Playa Bonita",samana).
+playa("Punta Bonita",samana).
 playa("La Playita",samana).
 playa("Playa el Portillo",samana).
 playa("Playa Cosón",samana).
@@ -38,7 +38,7 @@ playa("Playa Arena Gorda", bavaro).
 playa("Playa de Bayahibe", bayahibe).
 playa("Playa Dominicus", bayahibe).
 playa("Playa Palmilla", bayahibe).
-playa("Isla Saona", bayahibe).
+%playa("Isla Saona", bayahibe).
 /* segun el articulo esta en bayahibe, pero en google maps
  esta en la romana, lo dejo aqui adentro.
  tambien La Romana queda fuera de higuey (donde esta bayahibe)
@@ -67,9 +67,12 @@ playa("Playa Caleton", rio_san_juan).
 playa("Playa de los Minos", rio_san_juan).
 playa("Playa de los Muertos", rio_san_juan).
 
+% lugar\3 es la ciudad cercana, el nombre, y el tipo.
+lugar(Ciudad, Nombre):-playa(Nombre, Ciudad).
 
-% actividad\6 es nombre, lugar, tipo, costo, fecha con formato de date(Ano, Mes, Dia), calificación.
-actividad(X,Y, playa,0, date(_,_,_), 5):-playa(X,Y).
-actividad("El carnaval",la_vega, celebración,0, date(_,2,27),5).
-actividad("McDonald's",Lugar,restaurante,400,date(_,_,_),4):-
-    member(Lugar,[santiago,santo_domingo_de_este,santo_domingo,la_vega,puerto_plata]).
+
+% actividad\6 es nombre, lugar\2, tipo, costo, fecha con formato de date(Ano, Mes, Dia), calificación.
+actividad("El carnaval",lugar(la_vega, "Ciudad"), celebración,0, date(_,2,27),5).
+actividad("Little John at Juanillo Beach",lugar(punta_cana,"Playa Juanillo"),restaurante,2000,date(_,_,_),5).
+actividad("McDonald's",lugar(Ciudad, "Ciudad"),restaurante,400,date(_,_,_),4):-
+    member(Ciudad,[santiago,santo_domingo_de_este,santo_domingo,la_vega,puerto_plata]).

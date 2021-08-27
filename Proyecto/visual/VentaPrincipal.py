@@ -28,14 +28,22 @@ class VentaPrincial:
         frame_lugar = Frame(self.root)
         frame_lugar.grid(row=0, column=0, columnspan=2, padx=10, pady=(10, 0), sticky=EW)
         frame_lugar.grid_columnconfigure(1, weight=1)
+        frame_lugar.grid_columnconfigure(3, weight=1)
 
-        Label(frame_lugar, text="Lugar:").grid(row=0, column=0, sticky=W)
+        Label(frame_lugar, text="Ciudad:").grid(row=0, column=0, sticky=W)
 
-        self.__current_option = StringVar(value="Seleccione la ubicación.")
-        self.__options = ttk.Combobox(frame_lugar, textvariable=self.__current_option, state="readonly",
-                                      values=sorted(list(self.__ciudades.keys())))
-        self.__options.grid(row=0, column=1, padx=(5, 0), sticky=EW)
-        self.__options.bind("<<ComboboxSelected>>", self.__on_change)
+        self.__current_city = StringVar(value="Seleccione la ubicación.")
+        self.__options_city = ttk.Combobox(frame_lugar, textvariable=self.__current_city, state="readonly",
+                                           values=sorted(list(self.__ciudades.keys())))
+        self.__options_city.grid(row=0, column=1, padx=(5, 0), sticky=EW)
+        self.__options_city.bind("<<ComboboxSelected>>", self.__on_city_change)
+
+        Label(frame_lugar, text="Lugar:").grid(row=0, column=2, sticky=W)
+        self.__current_place = StringVar()
+        self.__options_place = ttk.Combobox(frame_lugar, textvariable=self.__current_place, state="readonly")
+        self.__options_place.grid(row=0, column=3, padx=(5, 0), sticky=EW)
+        self.__options_place.bind("<<ComboboxSelected>>", self.__on_change)
+
 
         frame_presupuesto = Frame(self.root)
         frame_presupuesto.grid(row=1, column=0, columnspan=2, padx=10, pady=(10, 0), sticky=EW)
@@ -122,35 +130,13 @@ class VentaPrincial:
         costo = self.__presupuesto.get()
         if len(costo) == 0:
             costo = None
-        self.__refresh_options(self.__ciudades[self.__current_option.get()], self.__fecha.get_fecha(), costo, self.tipos, self.calificaciones)
-
-    def __on_tipo_select(self):
-        self.tipos = set([i.get() for i in self.__tipos_valor if i.get()!=""])
-        self.__on_change()
-
-    def __on_calif_select(self):
-        self.calificaciones = set([i.get() for i in self.__califs_valor if i.get()!=""])
-        self.__on_change()
-
-    def __menubar(self):
-        menubar = Menu(self.root)
-        filemenu = Menu(menubar, tearoff=0)
-        filemenu.add_command(label="Nuevo", command=None)
-        filemenu.add_command(label="Abrir", command=None)
-        filemenu.add_command(label="Guardar", command=None)
-        filemenu.add_command(label="Exportar", command=None)
-        filemenu.add_separator()
-        filemenu.add_command(label="Salir", command=self.root.quit)
-        menubar.add_cascade(label="Archivo", menu=filemenu)
-        self.root.config(menu=menubar)
-
-    def __refresh_options(self, lugar, fecha, costo, tipos, calificaciones):
+        ciudad = self.__ciudades[self.__current_city.get()]
         for row in self.__table_data:
             for col in row:
                 col.destroy()
         self.__table_data.clear()
-        if lugar is not None:
-            for index, row in enumerate(self.controller.get_actividades(lugar, fecha, costo, tipos, calificaciones), start=1):
+        if ciudad is not None:
+            for index, row in enumerate(self.controller.get_actividades(ciudad, self.__current_place.get(), self.__fecha.get_fecha(), costo, self.tipos, self.calificaciones), start=1):
                 h = row['Nombre']
                 if type(h) is bytes:
                     h = h.decode("utf-8")
@@ -170,6 +156,31 @@ class VentaPrincial:
                 for j, i in enumerate(drow):
                     i.grid(row=index, column=j, sticky=NSEW)
                 self.__table_data.append(drow)
+
+    def __on_tipo_select(self):
+        self.tipos = set([i.get() for i in self.__tipos_valor if i.get()!=""])
+        self.__on_change()
+
+    def __on_calif_select(self):
+        self.calificaciones = set([i.get() for i in self.__califs_valor if i.get()!=""])
+        self.__on_change()
+
+    def __on_city_change(self, event=None):
+        self.__current_place.set("Ciudad")
+        self.__options_place["values"] = self.controller.get_lugares(self.__ciudades[self.__current_city.get()])
+        self.__on_change(event)
+
+    def __menubar(self):
+        menubar = Menu(self.root)
+        filemenu = Menu(menubar, tearoff=0)
+        filemenu.add_command(label="Nuevo", command=None)
+        filemenu.add_command(label="Abrir", command=None)
+        filemenu.add_command(label="Guardar", command=None)
+        filemenu.add_command(label="Exportar", command=None)
+        filemenu.add_separator()
+        filemenu.add_command(label="Salir", command=self.root.quit)
+        menubar.add_cascade(label="Archivo", menu=filemenu)
+        self.root.config(menu=menubar)
 
     def on_closing(self):
         if messagebox.askokcancel("Salir", "¿Quieres salir del programa?"):
