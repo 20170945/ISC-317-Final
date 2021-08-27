@@ -78,7 +78,6 @@ class VentaPrincial:
         self.tabla.scrollable_frame.grid_columnconfigure(0, weight=3)
         self.tabla.scrollable_frame.grid_columnconfigure(1, weight=1)
         self.tabla.scrollable_frame.grid_columnconfigure(2, weight=1)
-        self.tabla.scrollable_frame.grid_columnconfigure(3, weight=1)
         Label(self.tabla.scrollable_frame, text=" Nombre ", borderwidth=2, relief="solid", justify=CENTER,
               bg="light gray").grid(row=0,
                                     column=0,
@@ -91,17 +90,16 @@ class VentaPrincial:
               bg="light gray").grid(row=0,
                                     column=2,
                                     sticky=EW)
-        Label(self.tabla.scrollable_frame, text=" Opción ", borderwidth=2, relief="solid", justify=CENTER,
-              bg="light gray").grid(row=0,
-                                    column=3,
-                                    sticky=EW)
 
         self.root.grid_columnconfigure(0, weight=1)
         self.root.protocol("WM_DELETE_WINDOW", self.on_closing)
         self.root.mainloop()
 
     def __on_change(self, event=None):
-        self.__refresh_options(self.__ciudades[self.__current_option.get()], self.__fecha.get_fecha(), 0, self.tipos)
+        costo = self.__presupuesto.get()
+        if len(costo) == 0:
+            costo = None
+        self.__refresh_options(self.__ciudades[self.__current_option.get()], self.__fecha.get_fecha(), costo, self.tipos)
 
     def __on_tipo_select(self):
         self.tipos = set([i.get() for i in self.__tipos_valor])
@@ -132,15 +130,14 @@ class VentaPrincial:
                 if type(h) is bytes:
                     h = h.decode("utf-8")
                 drow = [
-                    Label(self.tabla.scrollable_frame, text=f" {h.title()} ", anchor=W, borderwidth=1, relief="solid",
+                    Label(self.tabla.scrollable_frame, text=f" {h} ", anchor=W, borderwidth=1, relief="solid",
                           bg="white"),
                     Label(self.tabla.scrollable_frame, text=f" {row['Tipo'].title()} ", borderwidth=1, justify=CENTER,
                           relief="solid",
                           bg="white"),
                     Label(self.tabla.scrollable_frame, text=f" {row['Costo']} ", anchor=E, borderwidth=1,
                           relief="solid",
-                          bg="white"),
-                    Button(self.tabla.scrollable_frame, text=" Detalles ")
+                          bg="white")
                 ]
                 for j, i in enumerate(drow):
                     i.grid(row=index, column=j, sticky=NSEW)
