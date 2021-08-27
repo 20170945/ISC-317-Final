@@ -15,10 +15,12 @@ class VentaPrincial:
         self.root.minsize(800, 600)
         # self.__menubar()
         self.__ciudades = self.controller.get_ciudades()
-        self.root.grid_rowconfigure(3, weight=1)
+        self.root.grid_rowconfigure(4, weight=1)
         # self.root.grid_columnconfigure(0, weight=2)
         self.root.grid_columnconfigure(1, weight=8)
         self.__table_data = []
+        self.tipos = []
+        self.calificaciones = []
 
         style = ttk.Style(self.root)
         style.theme_use(style.theme_names()[0])
@@ -43,7 +45,10 @@ class VentaPrincial:
 
         vcmd = (self.root.register(lambda P: (str.isdigit(P) or P == "")), '%P')
 
-        self.__presupuesto = Entry(frame_presupuesto, validate='all', validatecommand=vcmd, justify=RIGHT)
+        presupuesto_var = StringVar()
+        self.__presupuesto = Entry(frame_presupuesto, validate='all', textvariable=presupuesto_var, validatecommand=vcmd, justify=RIGHT)
+        presupuesto_var.trace_add("write", lambda a,b,c : self.__on_change())
+
         self.__presupuesto.grid(row=0, column=1, padx=(5, 0), sticky=EW)
 
         frame_fecha = Frame(self.root)
@@ -56,9 +61,21 @@ class VentaPrincial:
         self.__fecha.grid(row=0, column=1, sticky=W)
         self.__fecha.set_on_change(self.__on_change)
 
+        #calificacion
+        frame_calif = Frame(self.root, borderwidth=2, relief=SUNKEN)
+        frame_calif.grid(row=3, column=0, padx=(10,5),pady=(10,5),sticky=NSEW)
+        self.__califs_valor = []
+        Label(frame_calif, text="Calificaciones:").grid(row=0, column=0, sticky=W)
+        for index,i in enumerate(range(5,0,-1)):
+            self.__califs_valor.append(StringVar(value=i))
+            Checkbutton(frame_calif, text=i, variable=self.__califs_valor[index],
+                        onvalue=str(i), offvalue="",
+                        command=self.__on_calif_select).grid(row=index+1, column=0, sticky=W)
+        self.__on_calif_select()
+
         # tipos
         frame_tipos = Frame(self.root, borderwidth=2, relief=SUNKEN)
-        frame_tipos.grid(row=3, column=0, padx=(10, 5), pady=10, sticky=NSEW)
+        frame_tipos.grid(row=4, column=0, padx=(10, 5), pady=(0,10), sticky=NSEW)
         frame_tipos.grid_columnconfigure(0, weight=1)
         frame_tipos.grid_rowconfigure(1, weight=1)
         Label(frame_tipos, text="Tipos:").grid(row=0, column=0, sticky=W)
@@ -73,23 +90,29 @@ class VentaPrincial:
 
         # parte de la tabla
         self.tabla = ScrollableFrame(self.root, borderwidth=2, relief=SUNKEN)
-        self.tabla.grid(row=3, column=1, sticky=NSEW, padx=(0, 10), pady=10)
+        self.tabla.grid(row=3, rowspan=2, column=1, sticky=NSEW, padx=(0, 10), pady=10)
 
         self.tabla.scrollable_frame.grid_columnconfigure(0, weight=3)
         self.tabla.scrollable_frame.grid_columnconfigure(1, weight=1)
         self.tabla.scrollable_frame.grid_columnconfigure(2, weight=1)
+        self.tabla.scrollable_frame.grid_columnconfigure(3, weight=1)
         Label(self.tabla.scrollable_frame, text=" Nombre ", borderwidth=2, relief="solid", justify=CENTER,
               bg="light gray").grid(row=0,
                                     column=0,
                                     sticky=EW)
-        Label(self.tabla.scrollable_frame, text=" Tipo ", borderwidth=2, relief="solid", justify=CENTER,
+        Label(self.tabla.scrollable_frame, text=" Calificación ", borderwidth=2, relief="solid", justify=CENTER,
               bg="light gray").grid(row=0,
                                     column=1,
                                     sticky=EW)
-        Label(self.tabla.scrollable_frame, text=" Costo ", borderwidth=2, relief="solid", justify=CENTER,
+        Label(self.tabla.scrollable_frame, text=" Tipo ", borderwidth=2, relief="solid", justify=CENTER,
               bg="light gray").grid(row=0,
                                     column=2,
                                     sticky=EW)
+        Label(self.tabla.scrollable_frame, text=" Costo ", borderwidth=2, relief="solid", justify=CENTER,
+              bg="light gray").grid(row=0,
+                                    column=3,
+                                    sticky=EW)
+
 
         self.root.grid_columnconfigure(0, weight=1)
         self.root.protocol("WM_DELETE_WINDOW", self.on_closing)
@@ -99,12 +122,14 @@ class VentaPrincial:
         costo = self.__presupuesto.get()
         if len(costo) == 0:
             costo = None
-        self.__refresh_options(self.__ciudades[self.__current_option.get()], self.__fecha.get_fecha(), costo, self.tipos)
+        self.__refresh_options(self.__ciudades[self.__current_option.get()], self.__fecha.get_fecha(), costo, self.tipos, self.calificaciones)
 
     def __on_tipo_select(self):
-        self.tipos = set([i.get() for i in self.__tipos_valor])
-        if "" in self.tipos:
-            self.tipos.remove("")
+        self.tipos = set([i.get() for i in self.__tipos_valor if i.get()!=""])
+        self.__on_change()
+
+    def __on_calif_select(self):
+        self.calificaciones = set([i.get() for i in self.__califs_valor if i.get()!=""])
         self.__on_change()
 
     def __menubar(self):
@@ -119,18 +144,21 @@ class VentaPrincial:
         menubar.add_cascade(label="Archivo", menu=filemenu)
         self.root.config(menu=menubar)
 
-    def __refresh_options(self, lugar, fecha, costo, tipos):
+    def __refresh_options(self, lugar, fecha, costo, tipos, calificaciones):
         for row in self.__table_data:
             for col in row:
                 col.destroy()
         self.__table_data.clear()
         if lugar is not None:
-            for index, row in enumerate(self.controller.get_actividades(lugar, fecha, costo, tipos), start=1):
+            for index, row in enumerate(self.controller.get_actividades(lugar, fecha, costo, tipos, calificaciones), start=1):
                 h = row['Nombre']
                 if type(h) is bytes:
                     h = h.decode("utf-8")
                 drow = [
                     Label(self.tabla.scrollable_frame, text=f" {h} ", anchor=W, borderwidth=1, relief="solid",
+                          bg="white"),
+                    Label(self.tabla.scrollable_frame, text=f" {row['Calificacion']} ",  justify=CENTER, borderwidth=1,
+                          relief="solid",
                           bg="white"),
                     Label(self.tabla.scrollable_frame, text=f" {row['Tipo'].title()} ", borderwidth=1, justify=CENTER,
                           relief="solid",

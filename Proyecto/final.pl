@@ -68,9 +68,8 @@ playa("Playa de los Minos", rio_san_juan).
 playa("Playa de los Muertos", rio_san_juan).
 
 
-% actividad\5 es nombre, lugar, tipo, costo, fecha con formato de date(Ano, Mes, Dia).
-actividad(X,Y, playa,0, date(_,_,_)):-playa(X,Y).
-actividad("El carnaval",la_vega, celebración,0, date(_,2,27)).
-actividad("McDonald's",santiago,restaurante,400,date(_,_,_)).
-actividad("McDonald's",Lugar,restaurante,400,date(_,_,_)):-
+% actividad\6 es nombre, lugar, tipo, costo, fecha con formato de date(Ano, Mes, Dia), calificación.
+actividad(X,Y, playa,0, date(_,_,_), 5):-playa(X,Y).
+actividad("El carnaval",la_vega, celebración,0, date(_,2,27),5).
+actividad("McDonald's",Lugar,restaurante,400,date(_,_,_),4):-
     member(Lugar,[santiago,santo_domingo_de_este,santo_domingo,la_vega,puerto_plata]).
