@@ -72,7 +72,7 @@ lugar(Ciudad, Nombre):-playa(Nombre, Ciudad).
 
 
 % actividad\6 es nombre, lugar\2, tipo, costo, fecha con formato de date(Ano, Mes, Dia), calificación.
-actividad("El carnaval",lugar(la_vega, "Ciudad"), celebración,0, date(_,2,27),5).
+actividad("El Carnaval Vegano",lugar(la_vega, "Ciudad"), festival,0, date(_,2,27),5).
 actividad("Little John at Juanillo Beach",lugar(punta_cana,"Playa Juanillo"),restaurante,2000,date(_,_,_),5).
 actividad("McDonald's",lugar(Ciudad, "Ciudad"),restaurante,400,date(_,_,_),4):-
     member(Ciudad,[santiago,santo_domingo_de_este,santo_domingo,la_vega,puerto_plata]).
