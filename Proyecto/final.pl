@@ -70,9 +70,18 @@ playa("Playa de los Muertos", rio_san_juan).
 % lugar\3 es la ciudad cercana, el nombre, y el tipo.
 lugar(Ciudad, Nombre):-playa(Nombre, Ciudad).
 
+% weekday https://www.swi-prolog.org/pldoc/doc_for?object=day_of_the_week/2
+
+% restaurantes\4: nombre, lugar\2, costo, calificacion
+restaurante("Little John at Juanillo Beach",_,lugar(punta_cana,"Playa Juanillo"),2000,5).
+restaurante("McDonald's",_, lugar(Ciudad, "Ciudad"),400,5):-member(Ciudad,[santiago,santo_domingo_de_este,santo_domingo,la_vega,puerto_plata]).
+
+% festivales\5: nombre, fecha, lugar\2, costo, calificacion
+festival("El Carnaval Vegano",date(_,2,27),lugar(la_vega, "Ciudad"), 0, 5).
+
+% bares?
+bar(_,_,_,_).
 
 % actividad\6 es nombre, lugar\2, tipo, costo, fecha con formato de date(Ano, Mes, Dia), calificación.
-actividad("El Carnaval Vegano",lugar(la_vega, "Ciudad"), festival,0, date(_,2,27),5).
-actividad("Little John at Juanillo Beach",lugar(punta_cana,"Playa Juanillo"),restaurante,2000,date(_,_,_),5).
-actividad("McDonald's",lugar(Ciudad, "Ciudad"),restaurante,400,date(_,_,_),4):-
-    member(Ciudad,[santiago,santo_domingo_de_este,santo_domingo,la_vega,puerto_plata]).
+actividad(Nombre,Lugar,festival,Precio,Fecha,Calificacion):-festival(Nombre,Fecha,Lugar, Precio,Calificacion).
+actividad(Nombre,Lugar,restaurante,Precio,Fecha,Calificacion):-restaurante(Nombre,Fecha,Lugar,Precio,Calificacion).
