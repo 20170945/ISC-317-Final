@@ -91,22 +91,22 @@ en_range_tiempo(tiempo(HoraActual,MinActual),tiempo(HoraInicial,MinInicial),tiem
 
 
 % restaurantes\7: nombre, lugar\2, tipo, costo, fecha con formato de date(Ano, Mes, Dia), timpo, calificación.
-restaurante("Little John at Juanillo Beach", lugar(la_altagracia,"Playa Juanillo"), fino, 2000, _, Tiempo, 5) :-
+restaurante("Little John at Juanillo Beach", lugar(la_altagracia,"Playa Juanillo"), caribeña, 2000, _, Tiempo, 5) :-
     en_range_tiempo(Tiempo,tiempo(11, 0),tiempo(21,0)).
 restaurante("McDonald's", Lugar,comida_rápida, 400, _, Tiempo, 5):-
     en_range_tiempo(Tiempo,tiempo(7, 0),tiempo(22, 0)),
     member(Ciudad,["Santiago de los Caballeros","Santo Domingo","La Vega","Puerto Plata"]),
     lugar(Municipio, Ciudad),
     Lugar = lugar(Municipio, Ciudad).
-restaurante("YALLA",lugar(puerto_plata, "Playa Cabarete"),fino, 2000,_,Tiempo,5) :-
+restaurante("YALLA",lugar(puerto_plata, "Playa Cabarete"),española, 400,_,Tiempo,5) :-
     en_range_tiempo(Tiempo,tiempo(11,0),tiempo(22,0)).
-restaurante("Aqua",lugar(puerto_plata, "Playa Cabarete"),fino, 2000,_,Tiempo,5) :-
+restaurante("Aqua Restaurant",lugar(puerto_plata, "Playa Cabarete"),marisco, 550,_,Tiempo,5) :-
     en_range_tiempo(Tiempo,tiempo(8,0),tiempo(22,0)).
-restaurante("Beach Side Italian Restaurant Cabarete",lugar(puerto_plata, "Playa Cabarete"),fino, 2000,_,Tiempo,5) :-
+restaurante("Beach Side Italian Restaurant Cabarete",lugar(puerto_plata, "Playa Cabarete"),marisco, 2000,_,Tiempo,5) :-
     en_range_tiempo(Tiempo,tiempo(9,0),tiempo(22,0)).
-restaurante("Front Loop Café and Grill",lugar(puerto_plata, "Playa Cabarete"),fino, 500,_,Tiempo, 5) :-
+restaurante("Front Loop Café and Grill",lugar(puerto_plata, "Playa Cabarete"),asador, 500,_,Tiempo, 5) :-
     en_range_tiempo(Tiempo,tiempo(7,30),tiempo(21,0)).
-restaurante("La Casita de Papi",lugar(puerto_plata, "Playa Cabarete"),fino, 2000,Fecha,Tiempo,5) :-
+restaurante("La Casita de Papi",lugar(puerto_plata, "Playa Cabarete"),marisco, 1000,Fecha,Tiempo,5) :-
     weekday(Fecha,Dia),
     (
         (
@@ -115,13 +115,27 @@ restaurante("La Casita de Papi",lugar(puerto_plata, "Playa Cabarete"),fino, 2000
             en_range_tiempo(Tiempo,tiempo(13,0),tiempo(23,0))
         );
         (
-            Dia>5,
+            Dia>5 ,
             en_range_tiempo(Tiempo,tiempo(13,0),tiempo(21,0))
         );
         Dia = 0 %esto esta para poder coger todos los tipos de resturante
     ).
 
+restaurante("Restaurant Le Bistro",lugar(puerto_plata, "Playa Cabarete"),francesa, 1500,Fecha,Tiempo,5) :-
+    weekday(Fecha,Dia),
+    (
+        (
+            Dia=<5,
+            Dia>=1,
+            en_range_tiempo(Tiempo,tiempo(12,0),tiempo(22,0))
+        );
+        (
+            Dia=6,
+            en_range_tiempo(Tiempo,tiempo(12,0),tiempo(21,0))
+        );
+        Dia = 0 %esto esta para poder coger todos los tipos de resturante
+    ).
 
-evento("El Carnaval Vegano",date(_,2,27),_,lugar(la_vega, "La Vega"), 0, 5).
 % actividad\7 es nombre, lugar\2, tipo, costo, fecha con formato de date(Ano, Mes, Dia), timpo, calificación.
-actividad(Nombre,Lugar,evento,Precio,Fecha,Tiempo,Calificacion):-evento(Nombre,Fecha,Tiempo,Lugar, Precio,Calificacion).
+% actividad(Nombre,Lugar,Tipo,Precio,Fecha,Tiempo,Calificacion).
+actividad("El Carnaval Vegano",lugar(la_vega, "La Vega"),evento,0,date(_,2,27),_,5).
