@@ -16,7 +16,7 @@ class Controlador:
         self.prolog = Prolog()
         self.prolog.consult('final.pl')
 
-    def get_ciudades(self):
+    def get_provincias(self):
         for result in self.prolog.query("setof(X,A^B^C^D^E^Y^(actividad(A,lugar(X,Y),B,C,D,E);lugar(X,Y)),L)"):
             return defaultdict(lambda : None, {parse_prolog(str(i)): str(i) for i in result['L']})
 
@@ -24,11 +24,9 @@ class Controlador:
         for result in self.prolog.query("setof(X,A^B^C^D^E^actividad(A,B,X,C,D,E),L)"):
             return [str(i) for i in result['L']]
 
-    def get_lugares(self, ciudad):
-        for result in self.prolog.query(f"setof(X,A^B^C^D^E^(actividad(A,lugar({ciudad},X),B,C,D,E);lugar({ciudad},X)),L)"):
+    def get_lugares(self, provincia):
+        for result in self.prolog.query(f"setof(X,A^B^C^D^E^(actividad(A,lugar({provincia},X),B,C,D,E);lugar({provincia},X)),L)"):
             listado = [i.decode("utf-8") for i in result['L']]
-            if "Ciudad" not in listado:
-                listado = ["Ciudad"] + listado
             return listado
 
     def get_actividades(self, ciudad, lugar, fecha, costo, tipos, calificaciones):

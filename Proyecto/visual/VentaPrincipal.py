@@ -14,7 +14,7 @@ class VentaPrincial:
         self.root.title("Consulta")
         self.root.minsize(800, 600)
         # self.__menubar()
-        self.__ciudades = self.controller.get_ciudades()
+        self.__provincias = self.controller.get_provincias()
         self.root.grid_rowconfigure(4, weight=1)
         # self.root.grid_columnconfigure(0, weight=2)
         self.root.grid_columnconfigure(1, weight=8)
@@ -30,13 +30,13 @@ class VentaPrincial:
         frame_lugar.grid_columnconfigure(1, weight=1)
         frame_lugar.grid_columnconfigure(3, weight=1)
 
-        Label(frame_lugar, text="Ciudad:").grid(row=0, column=0, sticky=W)
+        Label(frame_lugar, text="Provincia:").grid(row=0, column=0, sticky=W)
 
-        self.__current_city = StringVar(value="Seleccione la ubicación.")
-        self.__options_city = ttk.Combobox(frame_lugar, textvariable=self.__current_city, state="readonly",
-                                           values=sorted(list(self.__ciudades.keys())))
-        self.__options_city.grid(row=0, column=1, padx=(5, 0), sticky=EW)
-        self.__options_city.bind("<<ComboboxSelected>>", self.__on_city_change)
+        self.__current_provincia = StringVar(value="Seleccione la ubicación.")
+        self.__options_provincia = ttk.Combobox(frame_lugar, textvariable=self.__current_provincia, state="readonly",
+                                                values=sorted(list(self.__provincias.keys())))
+        self.__options_provincia.grid(row=0, column=1, padx=(5, 0), sticky=EW)
+        self.__options_provincia.bind("<<ComboboxSelected>>", self.__on_provincia_change)
 
         Label(frame_lugar, text="Lugar:").grid(row=0, column=2, sticky=W)
         self.__current_place = StringVar()
@@ -130,13 +130,13 @@ class VentaPrincial:
         costo = self.__presupuesto.get()
         if len(costo) == 0:
             costo = None
-        ciudad = self.__ciudades[self.__current_city.get()]
+        provincia = self.__provincias[self.__current_provincia.get()]
         for row in self.__table_data:
             for col in row:
                 col.destroy()
         self.__table_data.clear()
-        if ciudad is not None:
-            for index, row in enumerate(self.controller.get_actividades(ciudad, self.__current_place.get(), self.__fecha.get_fecha(), costo, self.tipos, self.calificaciones), start=1):
+        if provincia is not None:
+            for index, row in enumerate(self.controller.get_actividades(provincia, self.__current_place.get(), self.__fecha.get_fecha(), costo, self.tipos, self.calificaciones), start=1):
                 h = row['Nombre']
                 if type(h) is bytes:
                     h = h.decode("utf-8")
@@ -165,9 +165,10 @@ class VentaPrincial:
         self.calificaciones = set([i.get() for i in self.__califs_valor if i.get()!=""])
         self.__on_change()
 
-    def __on_city_change(self, event=None):
-        self.__current_place.set("Ciudad")
-        self.__options_place["values"] = self.controller.get_lugares(self.__ciudades[self.__current_city.get()])
+    def __on_provincia_change(self, event=None):
+        listado = self.controller.get_lugares(self.__provincias[self.__current_provincia.get()])
+        self.__current_place.set(listado[0])
+        self.__options_place["values"] = listado
         self.__on_change(event)
 
     def __menubar(self):

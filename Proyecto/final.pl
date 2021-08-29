@@ -16,28 +16,28 @@ playa("Playa las Ballenas",samana).
 
 % punta cana https://www.cataloniahotels.com/es/blog/mejores-playas-de-punta-cana-y-bavaro/
 
-playa("Playa Juanillo", punta_cana).
-playa("Cabo Engaño", punta_cana).
-playa("Playa Cabeza de Toro", punta_cana).
+playa("Playa Juanillo", la_altagracia).
+playa("Cabo Engaño", la_altagracia).
+playa("Playa Cabeza de Toro", la_altagracia).
 
 % macao, pero queda en punta_cana
-playa("Playa Macao", macao).
+playa("Playa Macao", la_altagracia).
 
 /* Uvero Alto, tiene un parque pero tambien playa palmera,
  no encontre una playa llamada asi,
  pues supongo que es el mar, pero queda en punta canta.*/
 
-playa("Playa Uvero Alto", uvero_alto).
+playa("Playa Uvero Alto", la_altagracia).
 
 % en bávaro, pero queda en punta cana, asi que puede ser: playa(X, punta_cana) :- playa(X, bavaro).
-playa("Playa Bávaro", bavaro).
-playa("Playa Arena Blanca", bavaro).
-playa("Playa Arena Gorda", bavaro).
+playa("Playa Bávaro", la_altagracia).
+playa("Playa Arena Blanca", la_altagracia).
+playa("Playa Arena Gorda", la_altagracia).
 
 % en Bayahibe: https://enviajes.cl/republica-dominicana/bayahibe/playas-de-bayahibe/
-playa("Playa de Bayahibe", bayahibe).
-playa("Playa Dominicus", bayahibe).
-playa("Playa Palmilla", bayahibe).
+playa("Playa de Bayahibe", la_altagracia).
+playa("Playa Dominicus", la_altagracia).
+playa("Playa Palmilla", la_altagracia).
 %playa("Isla Saona", bayahibe).
 /* segun el articulo esta en bayahibe, pero en google maps
  esta en la romana, lo dejo aqui adentro.
@@ -61,23 +61,31 @@ playa("Playa Cambiaso", puerto_plata).
 https://www.minube.com/tag/playas-rio-san-juan-c261554
 https://www.visitarepublicadominicana.org/rio-san-juan
  */
-playa("Playa Grande", rio_san_juan).
-playa("Playa Preciosa", rio_san_juan).
-playa("Playa Caleton", rio_san_juan).
-playa("Playa de los Minos", rio_san_juan).
-playa("Playa de los Muertos", rio_san_juan).
+playa("Playa Grande", maría_trinidad_sánchez).
+playa("Playa Preciosa", maría_trinidad_sánchez).
+playa("Playa Caleton", maría_trinidad_sánchez).
+playa("Playa de los Minos", maría_trinidad_sánchez).
+playa("Playa de los Muertos", maría_trinidad_sánchez).
 
 % lugar\3 es la ciudad cercana, el nombre, y el tipo.
-lugar(Ciudad, Nombre):-playa(Nombre, Ciudad).
+lugar(Provincia, Nombre):-playa(Nombre, Provincia).
+lugar(la_vega, "La Vega").
+lugar(santiago, "Santiago de los Caballeros").
+lugar(santo_domingo, "Santo Domingo").
+lugar(puerto_plata, "Puerto Plata").
 
 % weekday https://www.swi-prolog.org/pldoc/doc_for?object=day_of_the_week/2
 
+
 % restaurantes\4: nombre, lugar\2, costo, calificacion
-restaurante("Little John at Juanillo Beach",_,lugar(punta_cana,"Playa Juanillo"),2000,5).
-restaurante("McDonald's",_, lugar(Ciudad, "Ciudad"),400,5):-member(Ciudad,[santiago,santo_domingo_de_este,santo_domingo,la_vega,puerto_plata]).
+restaurante("Little John at Juanillo Beach",_,lugar(la_altagracia,"Playa Juanillo"),2000,5).
+restaurante("McDonald's",_, Lugar, 400,5):-
+    member(Ciudad,["Santiago de los Caballeros","Santo Domingo","La Vega","Puerto Plata"]),
+    lugar(Municipio, Ciudad),
+    Lugar = lugar(Municipio, Ciudad).
 
 % festivales\5: nombre, fecha, lugar\2, costo, calificacion
-festival("El Carnaval Vegano",date(_,2,27),lugar(la_vega, "Ciudad"), 0, 5).
+festival("El Carnaval Vegano",date(_,2,27),lugar(la_vega, "La Vega"), 0, 5).
 
 % bares?
 bar(_,_,_,_).
