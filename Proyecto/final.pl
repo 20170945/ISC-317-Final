@@ -76,8 +76,8 @@ lugar(puerto_plata, "Puerto Plata").
 lugar(santo_domingo, "Zona Colonial").
 
 % weekday https://www.swi-prolog.org/pldoc/doc_for?object=day_of_the_week/2
-weekday([],1):-!.
-weekday(Fecha,Dia):- day_of_the_week(Fecha,Dia),!.
+weekday([],0):-!.
+weekday(Fecha,Dia):- day_of_the_week(Fecha,Dia).
 
 
 en_range_tiempo([],_,_) :- !.%esto es para prevenir un bug en la extracción de lugares.
@@ -90,23 +90,23 @@ en_range_tiempo(tiempo(HoraActual,MinActual),tiempo(HoraInicial,MinInicial),tiem
 
 
 
-% restaurantes\6: nombre, fecha, tiempo\2, lugar\2, costo, calificacion
-restaurante("Little John at Juanillo Beach",_,Tiempo,lugar(la_altagracia,"Playa Juanillo"),2000,5) :-
-    en_range_tiempo(Tiempo,tiempo(11,0),tiempo(21,0)).
-restaurante("McDonald's",_,Tiempo, Lugar, 400, 5):-
+% restaurantes\7: nombre, lugar\2, tipo, costo, fecha con formato de date(Ano, Mes, Dia), timpo, calificación.
+restaurante("Little John at Juanillo Beach", lugar(la_altagracia,"Playa Juanillo"), fino, 2000, _, Tiempo, 5) :-
+    en_range_tiempo(Tiempo,tiempo(11, 0),tiempo(21,0)).
+restaurante("McDonald's", Lugar,comida_rápida, 400, _, Tiempo, 5):-
     en_range_tiempo(Tiempo,tiempo(7, 0),tiempo(22, 0)),
     member(Ciudad,["Santiago de los Caballeros","Santo Domingo","La Vega","Puerto Plata"]),
     lugar(Municipio, Ciudad),
     Lugar = lugar(Municipio, Ciudad).
-restaurante("YALLA",_,Tiempo,lugar(puerto_plata, "Playa Cabarete"), 2000,5) :-
+restaurante("YALLA",lugar(puerto_plata, "Playa Cabarete"),fino, 2000,_,Tiempo,5) :-
     en_range_tiempo(Tiempo,tiempo(11,0),tiempo(22,0)).
-restaurante("Aqua",_,Tiempo,lugar(puerto_plata, "Playa Cabarete"), 2000,5) :-
+restaurante("Aqua",lugar(puerto_plata, "Playa Cabarete"),fino, 2000,_,Tiempo,5) :-
     en_range_tiempo(Tiempo,tiempo(8,0),tiempo(22,0)).
-restaurante("Beach Side Italian Restaurant Cabarete",_,Tiempo,lugar(puerto_plata, "Playa Cabarete"), 2000,5) :-
+restaurante("Beach Side Italian Restaurant Cabarete",lugar(puerto_plata, "Playa Cabarete"),fino, 2000,_,Tiempo,5) :-
     en_range_tiempo(Tiempo,tiempo(9,0),tiempo(22,0)).
-restaurante("Front Loop Café and Grill",_,Tiempo,lugar(puerto_plata, "Playa Cabarete"), 500,5) :-
+restaurante("Front Loop Café and Grill",lugar(puerto_plata, "Playa Cabarete"),fino, 500,_,Tiempo, 5) :-
     en_range_tiempo(Tiempo,tiempo(7,30),tiempo(21,0)).
-restaurante("La Casita de Papi",Fecha,Tiempo,lugar(puerto_plata, "Playa Cabarete"), 2000,5) :-
+restaurante("La Casita de Papi",lugar(puerto_plata, "Playa Cabarete"),fino, 2000,Fecha,Tiempo,5) :-
     weekday(Fecha,Dia),
     (
         (
@@ -117,16 +117,11 @@ restaurante("La Casita de Papi",Fecha,Tiempo,lugar(puerto_plata, "Playa Cabarete
         (
             Dia>5,
             en_range_tiempo(Tiempo,tiempo(13,0),tiempo(21,0))
-        )
+        );
+        Dia = 0 %esto esta para poder coger todos los tipos de resturante
     ).
-%restaurante("Beach Side Italian Restaurant Cabarete",_,Tiempo,lugar(puerto_plata, "Playa Cabarete"), 2000,5) :-
-%    en_range_tiempo(Tiempo,tiempo(9,0),tiempo(22,0)).
-% festivales\6: nombre, fecha, tiempo\2, lugar\2, costo, calificacion
+
+
 evento("El Carnaval Vegano",date(_,2,27),_,lugar(la_vega, "La Vega"), 0, 5).
-
-% bares?
-bar(_,_,_,_).
-
-% actividad\6 es nombre, lugar\2, tipo, costo, fecha con formato de date(Ano, Mes, Dia), calificación.
+% actividad\7 es nombre, lugar\2, tipo, costo, fecha con formato de date(Ano, Mes, Dia), timpo, calificación.
 actividad(Nombre,Lugar,evento,Precio,Fecha,Tiempo,Calificacion):-evento(Nombre,Fecha,Tiempo,Lugar, Precio,Calificacion).
-actividad(Nombre,Lugar,restaurante,Precio,Fecha,Tiempo,Calificacion):-restaurante(Nombre,Fecha,Tiempo,Lugar,Precio,Calificacion).

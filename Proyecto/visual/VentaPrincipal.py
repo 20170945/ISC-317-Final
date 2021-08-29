@@ -16,16 +16,152 @@ class VentaPrincial:
         self.root.minsize(800, 600)
         # self.__menubar()
         self.__provincias = self.controller.get_provincias()
-        self.root.grid_rowconfigure(4, weight=1)
-        # self.root.grid_columnconfigure(0, weight=2)
-        self.root.grid_columnconfigure(1, weight=8)
+        self.root.grid_rowconfigure(3, weight=1)
+        self.root.grid_columnconfigure(0, weight=1)
+
         self.__table_data = []
+        self.__tabla_restaurante = []
         self.tipos = []
         self.calificaciones = []
 
         style = ttk.Style(self.root)
         style.theme_use(style.theme_names()[0])
 
+        self.opciones_generales()
+
+        self.actividades_tab = ttk.Notebook(self.root)
+
+        tab_restaurante = self.gtab_restaurante(self.actividades_tab)
+        tab_otros = self.gtab_otro(self.actividades_tab)
+        self.actividades_tab.add(tab_restaurante, text="Restaurante")
+        self.actividades_tab.add(tab_otros, text="Otros")
+        self.actividades_tab.grid(row=3, column=0, pady=(5,0), sticky=NSEW)
+        self.actividades_tab.bind('<<NotebookTabChanged>>', self.__on_change)
+
+        self.root.grid_columnconfigure(0, weight=1)
+        self.root.protocol("WM_DELETE_WINDOW", self.on_closing)
+        self.root.mainloop()
+
+    def gtab_otro(self, cont):
+        tab_otros = Frame(cont)
+        tab_otros.grid_columnconfigure(0, weight=1)
+        tab_otros.grid_columnconfigure(1, weight=9)
+        tab_otros.grid_rowconfigure(1, weight=1)
+
+        # calificacion
+        frame_calif = Frame(tab_otros, borderwidth=2, relief=SUNKEN)
+        frame_calif.grid(row=0, column=0, padx=(0, 5), pady=(0, 5), sticky=NSEW)
+        self.__califs_valor = []
+        Label(frame_calif, text="Calificaciones:").grid(row=0, column=0, sticky=W)
+        for index, i in enumerate(range(5, 0, -1)):
+            self.__califs_valor.append(StringVar(value=i))
+            Checkbutton(frame_calif, text=i, variable=self.__califs_valor[index],
+                        onvalue=str(i), offvalue="",
+                        command=self.__on_change).grid(row=index + 1, column=0, sticky=W)
+        # self.__on_calif_select()
+
+        # tipos
+        frame_tipos = Frame(tab_otros, borderwidth=2, relief=SUNKEN)
+        frame_tipos.grid(row=1, column=0, padx=(0, 5), pady=(0, 0), sticky=NSEW)
+        frame_tipos.grid_columnconfigure(0, weight=1)
+        frame_tipos.grid_rowconfigure(1, weight=1)
+        Label(frame_tipos, text="Tipos:").grid(row=0, column=0, sticky=W)
+        tipos_scrollingframe = ScrollableFrame(frame_tipos)
+        tipos_scrollingframe.grid(row=1, column=0, sticky=NSEW)
+        self.__tipos_valor = []
+        for index, tipo in enumerate(self.controller.get_otro_tipos()):
+            self.__tipos_valor.append(StringVar(value=tipo))
+            Checkbutton(tipos_scrollingframe.scrollable_frame, text=tipo.replace('_',' ').title(), variable=self.__tipos_valor[index],
+                        onvalue=tipo, offvalue="",
+                        command=self.__on_change).grid(row=index, column=0, sticky=W)
+        # self.__on_tipo_select()
+
+        # parte de la tabla
+        self.tabla_otro = ScrollableFrame(tab_otros, borderwidth=2, relief=SUNKEN)
+        self.tabla_otro.grid(row=0, rowspan=2, column=1, sticky=NSEW)
+
+        self.tabla_otro.scrollable_frame.grid_columnconfigure(0, weight=3)
+        self.tabla_otro.scrollable_frame.grid_columnconfigure(1, weight=1)
+        self.tabla_otro.scrollable_frame.grid_columnconfigure(2, weight=1)
+        self.tabla_otro.scrollable_frame.grid_columnconfigure(3, weight=1)
+        Label(self.tabla_otro.scrollable_frame, text=" Nombre ", borderwidth=2, relief="solid", justify=CENTER,
+              bg="light gray").grid(row=0,
+                                    column=0,
+                                    sticky=EW)
+        Label(self.tabla_otro.scrollable_frame, text=" Calificación ", borderwidth=2, relief="solid", justify=CENTER,
+              bg="light gray").grid(row=0,
+                                    column=1,
+                                    sticky=EW)
+        Label(self.tabla_otro.scrollable_frame, text=" Tipo ", borderwidth=2, relief="solid", justify=CENTER,
+              bg="light gray").grid(row=0,
+                                    column=2,
+                                    sticky=EW)
+        Label(self.tabla_otro.scrollable_frame, text=" Costo ", borderwidth=2, relief="solid", justify=CENTER,
+              bg="light gray").grid(row=0,
+                                    column=3,
+                                    sticky=EW)
+        return tab_otros
+
+    def gtab_restaurante(self, cont):
+        tab = Frame(cont)
+        tab.grid_columnconfigure(0, weight=1)
+        tab.grid_columnconfigure(1, weight=9)
+        tab.grid_rowconfigure(1, weight=1)
+
+        # calificacion
+        frame_calif = Frame(tab, borderwidth=2, relief=SUNKEN)
+        frame_calif.grid(row=0, column=0, padx=(0, 5), pady=(0, 5), sticky=NSEW)
+        self.__calif_rest = []
+        Label(frame_calif, text="Calificaciones:").grid(row=0, column=0, sticky=W)
+        for index, i in enumerate(range(5, 0, -1)):
+            self.__calif_rest.append(StringVar(value=i))
+            Checkbutton(frame_calif, text=i, variable=self.__calif_rest[index],
+                        onvalue=str(i), offvalue="",
+                        command=self.__on_change).grid(row=index + 1, column=0, sticky=W)
+
+        # tipos
+        frame_tipos = Frame(tab, borderwidth=2, relief=SUNKEN)
+        frame_tipos.grid(row=1, column=0, padx=(0, 5), sticky=NSEW)
+        frame_tipos.grid_columnconfigure(0, weight=1)
+        frame_tipos.grid_rowconfigure(1, weight=1)
+        Label(frame_tipos, text="Tipos:").grid(row=0, column=0, sticky=W)
+        tipos_scrollingframe = ScrollableFrame(frame_tipos)
+        tipos_scrollingframe.grid(row=1, column=0, sticky=NSEW)
+        self.__tipos_res_valor = []
+        for index, tipo in enumerate(self.controller.get_restaurante_tipos()):
+            self.__tipos_res_valor.append(StringVar(value=tipo))
+            Checkbutton(tipos_scrollingframe.scrollable_frame, text=tipo.replace('_',' ').title(), variable=self.__tipos_res_valor[index],
+                        onvalue=tipo, offvalue="",
+                        command=self.__on_change).grid(row=index, column=0, sticky=W)
+
+        # parte de la tabla
+        self.tabla_res = ScrollableFrame(tab, borderwidth=2, relief=SUNKEN)
+        self.tabla_res.grid(row=0, rowspan=2, column=1, sticky=NSEW)
+
+        self.tabla_res.scrollable_frame.grid_columnconfigure(0, weight=3)
+        self.tabla_res.scrollable_frame.grid_columnconfigure(1, weight=1)
+        self.tabla_res.scrollable_frame.grid_columnconfigure(2, weight=1)
+        self.tabla_res.scrollable_frame.grid_columnconfigure(3, weight=1)
+        Label(self.tabla_res.scrollable_frame, text=" Nombre ", borderwidth=2, relief="solid", justify=CENTER,
+              bg="light gray").grid(row=0,
+                                    column=0,
+                                    sticky=EW)
+        Label(self.tabla_res.scrollable_frame, text=" Calificación ", borderwidth=2, relief="solid", justify=CENTER,
+              bg="light gray").grid(row=0,
+                                    column=1,
+                                    sticky=EW)
+        Label(self.tabla_res.scrollable_frame, text=" Tipo ", borderwidth=2, relief="solid", justify=CENTER,
+              bg="light gray").grid(row=0,
+                                    column=2,
+                                    sticky=EW)
+        Label(self.tabla_res.scrollable_frame, text=" Costo ", borderwidth=2, relief="solid", justify=CENTER,
+              bg="light gray").grid(row=0,
+                                    column=3,
+                                    sticky=EW)
+        return tab
+
+
+    def opciones_generales(self):
         frame_lugar = Frame(self.root)
         frame_lugar.grid(row=0, column=0, columnspan=2, padx=10, pady=(10, 0), sticky=EW)
         frame_lugar.grid_columnconfigure(1, weight=1)
@@ -74,73 +210,26 @@ class VentaPrincial:
         self.__fecha.set_on_change(self.__on_change)
 
         frame_tiempo = Frame(frame_datetime)
-        frame_tiempo.grid(row=0, column=1, sticky=NSEW, padx=(20,0))
+        frame_tiempo.grid(row=0, column=1, sticky=NSEW, padx=(20, 0))
         Label(frame_tiempo, text="Tiempo:").grid(row=0, column=0, sticky=W)
         self.__tiempo = WidgetTiempo(frame_tiempo)
         self.__tiempo.grid(row=0, column=1, sticky=W)
         self.__tiempo.set_on_change(self.__on_change)
-        # calificacion
-        frame_calif = Frame(self.root, borderwidth=2, relief=SUNKEN)
-        frame_calif.grid(row=3, column=0, padx=(10, 5), pady=(10, 5), sticky=NSEW)
-        self.__califs_valor = []
-        Label(frame_calif, text="Calificaciones:").grid(row=0, column=0, sticky=W)
-        for index, i in enumerate(range(5, 0, -1)):
-            self.__califs_valor.append(StringVar(value=i))
-            Checkbutton(frame_calif, text=i, variable=self.__califs_valor[index],
-                        onvalue=str(i), offvalue="",
-                        command=self.__on_calif_select).grid(row=index + 1, column=0, sticky=W)
-        self.__on_calif_select()
-
-        # tipos
-        frame_tipos = Frame(self.root, borderwidth=2, relief=SUNKEN)
-        frame_tipos.grid(row=4, column=0, padx=(10, 5), pady=(0, 10), sticky=NSEW)
-        frame_tipos.grid_columnconfigure(0, weight=1)
-        frame_tipos.grid_rowconfigure(1, weight=1)
-        Label(frame_tipos, text="Tipos:").grid(row=0, column=0, sticky=W)
-        tipos_scrollingframe = ScrollableFrame(frame_tipos)
-        tipos_scrollingframe.grid(row=1, column=0, sticky=NSEW)
-        self.__tipos_valor = []
-        for index, tipo in enumerate(self.controller.get_tipos()):
-            self.__tipos_valor.append(StringVar(value=tipo))
-            Checkbutton(tipos_scrollingframe.scrollable_frame, text=tipo.title(), variable=self.__tipos_valor[index],
-                        onvalue=tipo, offvalue="",
-                        command=self.__on_tipo_select).grid(row=index, column=0, sticky=W)
-        self.__on_tipo_select()
-
-        # parte de la tabla
-        self.tabla = ScrollableFrame(self.root, borderwidth=2, relief=SUNKEN)
-        self.tabla.grid(row=3, rowspan=2, column=1, sticky=NSEW, padx=(0, 10), pady=10)
-
-        self.tabla.scrollable_frame.grid_columnconfigure(0, weight=3)
-        self.tabla.scrollable_frame.grid_columnconfigure(1, weight=1)
-        self.tabla.scrollable_frame.grid_columnconfigure(2, weight=1)
-        self.tabla.scrollable_frame.grid_columnconfigure(3, weight=1)
-        Label(self.tabla.scrollable_frame, text=" Nombre ", borderwidth=2, relief="solid", justify=CENTER,
-              bg="light gray").grid(row=0,
-                                    column=0,
-                                    sticky=EW)
-        Label(self.tabla.scrollable_frame, text=" Calificación ", borderwidth=2, relief="solid", justify=CENTER,
-              bg="light gray").grid(row=0,
-                                    column=1,
-                                    sticky=EW)
-        Label(self.tabla.scrollable_frame, text=" Tipo ", borderwidth=2, relief="solid", justify=CENTER,
-              bg="light gray").grid(row=0,
-                                    column=2,
-                                    sticky=EW)
-        Label(self.tabla.scrollable_frame, text=" Costo ", borderwidth=2, relief="solid", justify=CENTER,
-              bg="light gray").grid(row=0,
-                                    column=3,
-                                    sticky=EW)
-
-        self.root.grid_columnconfigure(0, weight=1)
-        self.root.protocol("WM_DELETE_WINDOW", self.on_closing)
-        self.root.mainloop()
 
     def __on_change(self, event=None):
+        tab_id = self.actividades_tab.index(self.actividades_tab.select())
+        if tab_id == 0:
+            self.load_table_restaurante()
+        elif tab_id == 1:
+            self.load_table_otros()
+
+    def load_table_otros(self):
         fecha = self.__fecha.get_fecha()
         tiempo = self.__tiempo.get_time()
-        fechatiempo = datetime.datetime(fecha.year,fecha.month,fecha.day,tiempo.hora,tiempo.minuto)
+        fechatiempo = datetime.datetime(fecha.year, fecha.month, fecha.day, tiempo.hora, tiempo.minuto)
         costo = self.__presupuesto.get()
+        tipos = set([i.get() for i in self.__tipos_valor if i.get() != ""])
+        calificaciones = set([i.get() for i in self.__califs_valor if i.get() != ""])
         if len(costo) == 0:
             costo = None
         provincia = self.__provincias[self.__current_provincia.get()]
@@ -151,20 +240,22 @@ class VentaPrincial:
         if provincia is not None:
             for index, row in enumerate(
                     self.controller.get_actividades(provincia, self.__current_place.get(), fechatiempo,
-                                                    costo, self.tipos, self.calificaciones), start=1):
+                                                    costo, tipos, calificaciones), start=1):
                 h = row['Nombre']
                 if type(h) is bytes:
                     h = h.decode("utf-8")
                 drow = [
-                    Label(self.tabla.scrollable_frame, text=f" {h} ", anchor=W, borderwidth=1, relief="solid",
+                    Label(self.tabla_otro.scrollable_frame, text=f" {h} ", anchor=W, borderwidth=1, relief="solid",
                           bg="white"),
-                    Label(self.tabla.scrollable_frame, text=f" {row['Calificacion']} ", justify=CENTER, borderwidth=1,
+                    Label(self.tabla_otro.scrollable_frame, text=f" {row['Calificacion']} ", justify=CENTER,
+                          borderwidth=1,
                           relief="solid",
                           bg="white"),
-                    Label(self.tabla.scrollable_frame, text=f" {row['Tipo'].title()} ", borderwidth=1, justify=CENTER,
+                    Label(self.tabla_otro.scrollable_frame, text=f" {row['Tipo'].title()} ", borderwidth=1,
+                          justify=CENTER,
                           relief="solid",
                           bg="white"),
-                    Label(self.tabla.scrollable_frame, text=f" {row['Costo']} ", anchor=E, borderwidth=1,
+                    Label(self.tabla_otro.scrollable_frame, text=f" {row['Costo']} ", anchor=E, borderwidth=1,
                           relief="solid",
                           bg="white")
                 ]
@@ -172,13 +263,45 @@ class VentaPrincial:
                     i.grid(row=index, column=j, sticky=NSEW)
                 self.__table_data.append(drow)
 
-    def __on_tipo_select(self):
-        self.tipos = set([i.get() for i in self.__tipos_valor if i.get() != ""])
-        self.__on_change()
-
-    def __on_calif_select(self):
-        self.calificaciones = set([i.get() for i in self.__califs_valor if i.get() != ""])
-        self.__on_change()
+    def load_table_restaurante(self):
+        fecha = self.__fecha.get_fecha()
+        tiempo = self.__tiempo.get_time()
+        fechatiempo = datetime.datetime(fecha.year, fecha.month, fecha.day, tiempo.hora, tiempo.minuto)
+        costo = self.__presupuesto.get()
+        tipos = set([i.get() for i in self.__tipos_res_valor if i.get() != ""])
+        calificaciones = set([i.get() for i in self.__calif_rest if i.get() != ""])
+        if len(costo) == 0:
+            costo = None
+        provincia = self.__provincias[self.__current_provincia.get()]
+        for row in self.__table_data:
+            for col in row:
+                col.destroy()
+        self.__table_data.clear()
+        if provincia is not None:
+            for index, row in enumerate(
+                    self.controller.get_restaurantes(provincia, self.__current_place.get(), fechatiempo,
+                                                     costo, tipos, calificaciones), start=1):
+                h = row['Nombre']
+                if type(h) is bytes:
+                    h = h.decode("utf-8")
+                drow = [
+                    Label(self.tabla_res.scrollable_frame, text=f" {h} ", anchor=W, borderwidth=1, relief="solid",
+                          bg="white"),
+                    Label(self.tabla_res.scrollable_frame, text=f" {row['Calificacion']} ", justify=CENTER,
+                          borderwidth=1,
+                          relief="solid",
+                          bg="white"),
+                    Label(self.tabla_res.scrollable_frame, text=f" {row['Tipo'].title()} ", borderwidth=1,
+                          justify=CENTER,
+                          relief="solid",
+                          bg="white"),
+                    Label(self.tabla_res.scrollable_frame, text=f" {row['Costo']} ", anchor=E, borderwidth=1,
+                          relief="solid",
+                          bg="white")
+                ]
+                for j, i in enumerate(drow):
+                    i.grid(row=index, column=j, sticky=NSEW)
+                self.__table_data.append(drow)
 
     def __on_provincia_change(self, event=None):
         listado = self.controller.get_lugares(self.__provincias[self.__current_provincia.get()])
