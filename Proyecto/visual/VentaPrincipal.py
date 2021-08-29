@@ -1,10 +1,11 @@
+import datetime
 from tkinter import *
 from tkinter import ttk
 from tkinter import messagebox
 
 from logic.controller import Controlador
 from visual.ScrollableFrame import *
-from visual.widgets.fecha import WidgetFecha
+from visual.widgets.datetime import WidgetFecha, WidgetTiempo
 
 
 class VentaPrincial:
@@ -44,7 +45,6 @@ class VentaPrincial:
         self.__options_place.grid(row=0, column=3, padx=(5, 0), sticky=EW)
         self.__options_place.bind("<<ComboboxSelected>>", self.__on_change)
 
-
         frame_presupuesto = Frame(self.root)
         frame_presupuesto.grid(row=1, column=0, columnspan=2, padx=10, pady=(10, 0), sticky=EW)
         frame_presupuesto.grid_columnconfigure(1, weight=1)
@@ -54,13 +54,17 @@ class VentaPrincial:
         vcmd = (self.root.register(lambda P: (str.isdigit(P) or P == "")), '%P')
 
         presupuesto_var = StringVar()
-        self.__presupuesto = Entry(frame_presupuesto, validate='all', textvariable=presupuesto_var, validatecommand=vcmd, justify=RIGHT)
-        presupuesto_var.trace_add("write", lambda a,b,c : self.__on_change())
+        self.__presupuesto = Entry(frame_presupuesto, validate='all', textvariable=presupuesto_var,
+                                   validatecommand=vcmd, justify=RIGHT)
+        presupuesto_var.trace_add("write", lambda a, b, c: self.__on_change())
 
         self.__presupuesto.grid(row=0, column=1, padx=(5, 0), sticky=EW)
 
-        frame_fecha = Frame(self.root)
-        frame_fecha.grid(row=2, column=0, columnspan=2, padx=10, pady=(10, 0), sticky=EW)
+        frame_datetime = Frame(self.root)
+        frame_datetime.grid(row=2, column=0, columnspan=2, padx=10, pady=(10, 0), sticky=EW)
+
+        frame_fecha = Frame(frame_datetime)
+        frame_fecha.grid(row=0, column=0, sticky=NSEW)
         frame_fecha.grid_columnconfigure(1, weight=1)
 
         Label(frame_fecha, text="Fecha:").grid(row=0, column=0, sticky=W)
@@ -69,21 +73,27 @@ class VentaPrincial:
         self.__fecha.grid(row=0, column=1, sticky=W)
         self.__fecha.set_on_change(self.__on_change)
 
-        #calificacion
+        frame_tiempo = Frame(frame_datetime)
+        frame_tiempo.grid(row=0, column=1, sticky=NSEW, padx=(20,0))
+        Label(frame_tiempo, text="Tiempo:").grid(row=0, column=0, sticky=W)
+        self.__tiempo = WidgetTiempo(frame_tiempo)
+        self.__tiempo.grid(row=0, column=1, sticky=W)
+        self.__tiempo.set_on_change(self.__on_change)
+        # calificacion
         frame_calif = Frame(self.root, borderwidth=2, relief=SUNKEN)
-        frame_calif.grid(row=3, column=0, padx=(10,5),pady=(10,5),sticky=NSEW)
+        frame_calif.grid(row=3, column=0, padx=(10, 5), pady=(10, 5), sticky=NSEW)
         self.__califs_valor = []
         Label(frame_calif, text="Calificaciones:").grid(row=0, column=0, sticky=W)
-        for index,i in enumerate(range(5,0,-1)):
+        for index, i in enumerate(range(5, 0, -1)):
             self.__califs_valor.append(StringVar(value=i))
             Checkbutton(frame_calif, text=i, variable=self.__califs_valor[index],
                         onvalue=str(i), offvalue="",
-                        command=self.__on_calif_select).grid(row=index+1, column=0, sticky=W)
+                        command=self.__on_calif_select).grid(row=index + 1, column=0, sticky=W)
         self.__on_calif_select()
 
         # tipos
         frame_tipos = Frame(self.root, borderwidth=2, relief=SUNKEN)
-        frame_tipos.grid(row=4, column=0, padx=(10, 5), pady=(0,10), sticky=NSEW)
+        frame_tipos.grid(row=4, column=0, padx=(10, 5), pady=(0, 10), sticky=NSEW)
         frame_tipos.grid_columnconfigure(0, weight=1)
         frame_tipos.grid_rowconfigure(1, weight=1)
         Label(frame_tipos, text="Tipos:").grid(row=0, column=0, sticky=W)
@@ -92,7 +102,8 @@ class VentaPrincial:
         self.__tipos_valor = []
         for index, tipo in enumerate(self.controller.get_tipos()):
             self.__tipos_valor.append(StringVar(value=tipo))
-            Checkbutton(tipos_scrollingframe.scrollable_frame, text=tipo.title(), variable=self.__tipos_valor[index], onvalue=tipo, offvalue="",
+            Checkbutton(tipos_scrollingframe.scrollable_frame, text=tipo.title(), variable=self.__tipos_valor[index],
+                        onvalue=tipo, offvalue="",
                         command=self.__on_tipo_select).grid(row=index, column=0, sticky=W)
         self.__on_tipo_select()
 
@@ -121,12 +132,14 @@ class VentaPrincial:
                                     column=3,
                                     sticky=EW)
 
-
         self.root.grid_columnconfigure(0, weight=1)
         self.root.protocol("WM_DELETE_WINDOW", self.on_closing)
         self.root.mainloop()
 
     def __on_change(self, event=None):
+        fecha = self.__fecha.get_fecha()
+        tiempo = self.__tiempo.get_time()
+        fechatiempo = datetime.datetime(fecha.year,fecha.month,fecha.day,tiempo.hora,tiempo.minuto)
         costo = self.__presupuesto.get()
         if len(costo) == 0:
             costo = None
@@ -136,14 +149,16 @@ class VentaPrincial:
                 col.destroy()
         self.__table_data.clear()
         if provincia is not None:
-            for index, row in enumerate(self.controller.get_actividades(provincia, self.__current_place.get(), self.__fecha.get_fecha(), costo, self.tipos, self.calificaciones), start=1):
+            for index, row in enumerate(
+                    self.controller.get_actividades(provincia, self.__current_place.get(), fechatiempo,
+                                                    costo, self.tipos, self.calificaciones), start=1):
                 h = row['Nombre']
                 if type(h) is bytes:
                     h = h.decode("utf-8")
                 drow = [
                     Label(self.tabla.scrollable_frame, text=f" {h} ", anchor=W, borderwidth=1, relief="solid",
                           bg="white"),
-                    Label(self.tabla.scrollable_frame, text=f" {row['Calificacion']} ",  justify=CENTER, borderwidth=1,
+                    Label(self.tabla.scrollable_frame, text=f" {row['Calificacion']} ", justify=CENTER, borderwidth=1,
                           relief="solid",
                           bg="white"),
                     Label(self.tabla.scrollable_frame, text=f" {row['Tipo'].title()} ", borderwidth=1, justify=CENTER,
@@ -158,11 +173,11 @@ class VentaPrincial:
                 self.__table_data.append(drow)
 
     def __on_tipo_select(self):
-        self.tipos = set([i.get() for i in self.__tipos_valor if i.get()!=""])
+        self.tipos = set([i.get() for i in self.__tipos_valor if i.get() != ""])
         self.__on_change()
 
     def __on_calif_select(self):
-        self.calificaciones = set([i.get() for i in self.__califs_valor if i.get()!=""])
+        self.calificaciones = set([i.get() for i in self.__califs_valor if i.get() != ""])
         self.__on_change()
 
     def __on_provincia_change(self, event=None):

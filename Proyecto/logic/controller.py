@@ -17,22 +17,22 @@ class Controlador:
         self.prolog.consult('final.pl')
 
     def get_provincias(self):
-        for result in self.prolog.query("setof(X,A^B^C^D^E^Y^(actividad(A,lugar(X,Y),B,C,D,E);lugar(X,Y)),L)"):
+        for result in self.prolog.query("setof(X,Y^lugar(X,Y),L)"):
             return defaultdict(lambda : None, {parse_prolog(str(i)): str(i) for i in result['L']})
 
     def get_tipos(self):
-        for result in self.prolog.query("setof(X,A^B^C^D^E^actividad(A,B,X,C,D,E),L)"):
+        for result in self.prolog.query("setof(X,A^B^C^D^E^F^actividad(A,B,X,C,D,E,F),L)"):
             return [str(i) for i in result['L']]
 
     def get_lugares(self, provincia):
-        for result in self.prolog.query(f"setof(X,A^B^C^D^E^(actividad(A,lugar({provincia},X),B,C,D,E);lugar({provincia},X)),L)"):
+        for result in self.prolog.query(f"setof(X,A^B^C^D^E^F^(actividad(A,lugar({provincia},X),B,C,D,E,F);lugar({provincia},X)),L)"):
             listado = [i.decode("utf-8") for i in result['L']]
             return listado
 
-    def get_actividades(self, ciudad, lugar, fecha, costo, tipos, calificaciones):
-        if fecha is None:
+    def get_actividades(self, ciudad, lugar, datetime, costo, tipos, calificaciones):
+        if datetime is None:
             return []
-        query = f"actividad(Nombre,lugar({ciudad},\"{lugar}\"),Tipo,Costo,date({fecha.year},{fecha.month},{fecha.day}),Calificacion)"
+        query = f"actividad(Nombre,lugar({ciudad},\"{lugar}\"),Tipo,Costo,date({datetime.year},{datetime.month},{datetime.day}),tiempo({datetime.hour},{datetime.minute}),Calificacion)"
         if costo is not None:
             query+=f",Costo=<{costo}"
         if len(tipos) > 0:

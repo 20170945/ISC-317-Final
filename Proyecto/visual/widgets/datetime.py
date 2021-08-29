@@ -1,9 +1,18 @@
 from calendar import monthrange
 from tkinter import *
-from datetime import date
+from datetime import date, datetime
 from tkinter import ttk
 
 today = date.today()
+
+
+class AnswerTime:
+    def __init__(self, hora, minuto):
+        self.hora = hora
+        self.minuto = minuto
+
+    def __str__(self):
+        return f"{self.hora}:{self.minuto}"
 
 class WidgetFecha(Frame):
     def __init__(self, container, *args, **kwargs):
@@ -29,6 +38,8 @@ class WidgetFecha(Frame):
         )
         self.day_spinbox.grid(row=0, column=0,sticky=NS)
 
+        Label(self,text="/").grid(row=0, column=1)
+
         self.month_combobox =ttk.Combobox(self, state="readonly", justify=CENTER,
                                       values=[
                                           "Enero",
@@ -45,7 +56,9 @@ class WidgetFecha(Frame):
                                           "Diciembre"
                                       ])
         self.month_combobox.current(hoy.month-1)
-        self.month_combobox.grid(row=0,column=1)
+        self.month_combobox.grid(row=0,column=2)
+
+        Label(self, text="/").grid(row=0, column=3)
 
 
         self.__year = StringVar(value=hoy.year)
@@ -61,7 +74,7 @@ class WidgetFecha(Frame):
             justify=RIGHT,
             width=7
         )
-        self.year_spinbox.grid(row=0, column=2,sticky=NS)
+        self.year_spinbox.grid(row=0, column=4,sticky=NS)
         self.set_day_limit()
 
     def get_fecha(self):
@@ -95,3 +108,30 @@ class WidgetFecha(Frame):
         self.month_combobox.bind("<<ComboboxSelected>>", lambda e:(self.set_day_limit(),target(e)))
         self.__year.trace("w", lambda name, index, mode, sv=self.__year: (self.set_day_limit(),target()))
 
+class WidgetTiempo(Frame):
+    def __init__(self, container, *args, **kwargs):
+        super().__init__(container, *args, **kwargs)
+
+        hoy = datetime.now()
+        hora = str(hoy.hour)
+        if len(hora)==1:
+            hora = '0'+hora
+        minuto = str(hoy.minute)
+        if len(minuto)==1:
+            minuto = '0'+minuto
+        self.grid_rowconfigure(0, weight=1)
+        self.grid_columnconfigure(1, weight=1)
+        self.__hora = StringVar(value=hora)
+        self.hora_cb = ttk.Combobox(self, state="readonly", textvariable=self.__hora,width=4, justify=CENTER,values=[str(i) if i>9 else f'0{i}' for i in range(0,24)])
+        self.hora_cb.grid(row=0, column=0,sticky=NS)
+        Label(self, text=":").grid(row=0, column=1)
+        self.__minuto = StringVar(value=minuto)
+        self.minuto_cb = ttk.Combobox(self, state="readonly",textvariable=self.__minuto,width=4, justify=CENTER, values=[str(i) if i>9 else f'0{i}' for i in range(0, 60)])
+        self.minuto_cb.grid(row=0, column=2,sticky=NS)
+
+    def get_time(self):
+        return AnswerTime(int(self.hora_cb.get()),int(self.minuto_cb.get()))
+
+    def set_on_change(self,target):
+        self.hora_cb.bind("<<ComboboxSelected>>", lambda e: target(e))
+        self.minuto_cb.bind("<<ComboboxSelected>>", lambda e: target(e))
