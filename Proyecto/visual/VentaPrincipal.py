@@ -256,18 +256,56 @@ class VentaPrincial:
         self.__tiempo.grid(row=0, column=1, sticky=W)
         self.__tiempo.set_on_change(self.__on_change)
 
+        # Campo de Precio Min
+        frame_min = Frame(frame_datetime)
+        frame_min.grid(row=0, column=1, sticky=NSEW, padx=(205, 0))
+        Label(frame_min, text="Precio Min:").grid(row=0, column=0, sticky=W)
+
+        vcmd = (self.root.register(lambda P: (str.isdigit(P) or P == "")), '%P')
+
+        min_var = StringVar()
+        self.__min = Entry(frame_min, validate='all', textvariable=min_var,
+                           validatecommand=vcmd, width=7, justify=RIGHT)
+        min_var.trace_add("write", lambda a, b, c: self.__on_change())
+
+        self.__min.grid(row=0, column=1, sticky=W)
+
+        #Campo de Precio Máx
         frame_max = Frame(frame_datetime)
-        frame_max.grid(row=0, column=1, sticky=NSEW, padx=(205, 0))
+        frame_max.grid(row=0, column=1, sticky=NSEW, padx=(322, 0))
         Label(frame_max, text="Precio Máx:").grid(row=0, column=0, sticky=W)
 
         vcmd = (self.root.register(lambda P: (str.isdigit(P) or P == "")), '%P')
 
         max_var = StringVar()
         self.__max = Entry(frame_max, validate='all', textvariable=max_var,
-                                   validatecommand=vcmd, justify=RIGHT)
+                                   validatecommand=vcmd, width=7, justify=RIGHT)
         max_var.trace_add("write", lambda a, b, c: self.__on_change())
 
         self.__max.grid(row=0, column=1, sticky=W)
+
+        # Campo de Porcentaje de presupuesto
+        frame_porcentaje = Frame(frame_datetime)
+        frame_porcentaje.grid(row=2, column=0, pady=(10, 0), sticky=NSEW)
+        frame_porcentaje.grid_columnconfigure(1, weight=1)
+
+        Label(frame_porcentaje, text="Porcentaje:").grid(row=0, column=0, sticky=W)
+
+        vcmd = (self.root.register(lambda P: (str.isdigit(P) or P == "")), '%P')
+        porc_var = StringVar()
+
+        self.__porc = ttk.Spinbox(
+            frame_porcentaje,
+            from_=0,
+            to=100,
+            textvariable=porc_var,
+            wrap=True,
+            validate=ALL,
+            validatecommand=vcmd,
+            justify=RIGHT
+        )
+        self.__porc.grid(row=0, column=1, sticky=W)
+
 
     def __on_change(self, event=None):
         tab_id = self.actividades_tab.index(self.actividades_tab.select())
@@ -365,11 +403,19 @@ class VentaPrincial:
         fechatiempo = datetime.datetime(fecha.year, fecha.month, fecha.day, tiempo.hora, tiempo.minuto)
         costo = self.__presupuesto.get()
         max = self.__max.get()
+        min = self.__min.get()
+        porcentaje = self.__porc.get()
         calificaciones = set([i.get() for i in self.__calif_bar if i.get() != ""])
         if len(costo) == 0:
             costo = None
         if len(max) == 0:
             max = None
+        if len(min) == 0:
+            min = None
+        if len(porcentaje) == 0 or int(porcentaje) == 0:
+            porcentaje = None
+        else:
+            porcentaje = int(porcentaje)
         provincia = self.__provincias[self.__current_provincia.get()]
         for row in self.__table_data:
             for col in row:
@@ -378,7 +424,7 @@ class VentaPrincial:
         if provincia is not None:
             for index, row in enumerate(
                     self.controller.get_bares(provincia, self.__current_place.get(), fechatiempo,
-                                                     costo, calificaciones, max), start=1):
+                                                     costo, calificaciones, porcentaje, min, max), start=1):
                 h = row['Nombre']
                 if type(h) is bytes:
                     h = h.decode("utf-8")

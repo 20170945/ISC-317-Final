@@ -40,12 +40,16 @@ class Controlador:
             return []
         return [i for i in self.prolog.query(query)]
 
-    def __query_2(self, og_query, costo, calificaciones, max):
+    def __query_2(self, og_query, costo, calificaciones, porcentaje, min, max):
         query = og_query
         if costo is not None:
             query += f",Costo=<{costo}"
         if max is not None:
             query += f",Costo=<{max}"
+        if min is not None:
+            query += f",Costo>={min}"
+        if porcentaje is not None and costo is not None:
+            query += f",Costo=<{(int(costo) * porcentaje)/100}"
         if len(calificaciones) > 0:
             query += f",member(Calificacion,[{','.join(calificaciones)}])"
         else:
@@ -68,11 +72,11 @@ class Controlador:
         query = f"restaurante(Nombre, lugar({ciudad},\"{lugar}\"), Tipo, Costo, date({datetime.year},{datetime.month},{datetime.day}), tiempo({datetime.hour},{datetime.minute}), Calificacion)"
         return self.__query_(query, costo, tipos, calificaciones)
 
-    def get_bares(self, ciudad, lugar, datetime, costo, calificaciones, max):
+    def get_bares(self, ciudad, lugar, datetime, costo, calificaciones, porcentaje, min, max):
         if datetime is None:
             return []
         query = f"bar(Nombre, lugar({ciudad},\"{lugar}\"), Costo, Calificacion, date({datetime.year},{datetime.month},{datetime.day}), tiempo({datetime.hour},{datetime.minute}))"
-        return self.__query_2(query, costo, calificaciones, max)
+        return self.__query_2(query, costo, calificaciones, porcentaje, min, max)
 
     def get_restaurante_tipos(self):
         for result in self.prolog.query("setof(X,A^B^C^D^E^restaurante(A,B,X,C,D,[],E),L)"):
