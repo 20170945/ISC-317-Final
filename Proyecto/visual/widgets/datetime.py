@@ -15,9 +15,10 @@ class AnswerTime:
         return f"{self.hora}:{self.minuto}"
 
 class WidgetFecha(Frame):
-    def __init__(self, container, *args, **kwargs):
+    def __init__(self, container, dia=True, *args, **kwargs):
         super().__init__(container, *args, **kwargs)
 
+        self.__day_is = dia
         hoy = date.today()
         self.grid_rowconfigure(0, weight=1)
         self.grid_columnconfigure(2, weight=1)
@@ -36,9 +37,9 @@ class WidgetFecha(Frame):
             justify=RIGHT,
             width=5
         )
-        self.day_spinbox.grid(row=0, column=0,sticky=NS)
-
-        Label(self,text="/").grid(row=0, column=1)
+        if dia:
+            self.day_spinbox.grid(row=0, column=0,sticky=NS)
+            Label(self,text="/").grid(row=0, column=1)
 
         self.month_combobox =ttk.Combobox(self, state="readonly", justify=CENTER,
                                       values=[
@@ -56,9 +57,9 @@ class WidgetFecha(Frame):
                                           "Diciembre"
                                       ])
         self.month_combobox.current(hoy.month-1)
-        self.month_combobox.grid(row=0,column=2)
+        self.month_combobox.grid(row=0,column=2 if dia else 0)
 
-        Label(self, text="/").grid(row=0, column=3)
+        Label(self, text="/").grid(row=0, column=3 if dia else 1)
 
 
         self.__year = StringVar(value=hoy.year)
@@ -74,7 +75,7 @@ class WidgetFecha(Frame):
             justify=RIGHT,
             width=7
         )
-        self.year_spinbox.grid(row=0, column=4,sticky=NS)
+        self.year_spinbox.grid(row=0, column=4 if dia else 2,sticky=NS)
         self.set_day_limit()
 
     def get_fecha(self):
@@ -104,9 +105,11 @@ class WidgetFecha(Frame):
 
 
     def set_on_change(self, target):
-        self.__day.trace("w", lambda name, index, mode, sv=self.__day: target())
-        self.month_combobox.bind("<<ComboboxSelected>>", lambda e:(self.set_day_limit(),target(e)))
-        self.__year.trace("w", lambda name, index, mode, sv=self.__year: (self.set_day_limit(),target()))
+        dia = self.__day_is
+        if dia:
+            self.__day.trace("w", lambda name, index, mode, sv=self.__day: target())
+        self.month_combobox.bind("<<ComboboxSelected>>", lambda e:(self.set_day_limit() if dia else None,target(e)))
+        self.__year.trace("w", lambda name, index, mode, sv=self.__year: (self.set_day_limit() if dia else None,target()))
 
 class WidgetTiempo(Frame):
     def __init__(self, container, *args, **kwargs):

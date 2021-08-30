@@ -407,5 +407,22 @@ actividad_cultural("Teatro Guloya", lugar(santo_domingo,"Santo Domingo"), "Obra 
 % actividad\7 es nombre, lugar\2, tipo, costo, fecha con formato de date(Ano, Mes, Dia), timpo, calificación.
 % actividad(Nombre,Lugar,Tipo,Precio,Fecha,Tiempo,Calificacion).
 actividad("El Carnaval",lugar(_, _),evento,0,date(_,2,27),_,5).
+actividad("Musik Festival",lugar(la_altagracia, "Playa Bávaro"),evento,2500,date(2021,8,20),_,5).
+actividad("Sorpresa",lugar(la_altagracia, "Playa Bávaro"),evento,1500,date(2021,8,14),_,5).
+actividad("Late-Winter Festival",lugar(la_altagracia, "Playa Bávaro"),evento,1000,date(2021,2,14),_,3).
+
+eventos_en_mes(L, Lugar, Costo, Mes, Year, Calificaciones) :-
+    setof(
+        actividad(N,Lugar,evento,P,date(Year,Mes,D),T,C),
+        (
+            actividad(N,Lugar,evento,P,date(Year,Mes,D),T,C),
+            (
+                Costo = inf;
+                (Costo \= inf , P =< Costo)
+            ),
+            member(C, Calificaciones)
+        ),
+        L
+    ).
 
 tipos_de_otros(L):-setof(X,A^B^C^D^E^F^actividad(A,B,X,C,D,E,F),L).

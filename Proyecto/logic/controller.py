@@ -108,9 +108,20 @@ class Controlador:
                                        generos):
         q_lugar = f"lugar({provincia},\"{lugar}\")"
         if len(calificaciones) == 0:
-            return 0
+            return []
         if presupuesto is None:
             presupuesto = 'inf'
         for result in self.prolog.query(
                 f"weekday(date({datetime.year},{datetime.month},{datetime.day}),Weekday),peliculas_de_cine(cine(\"{nombre_cine}\",{q_lugar},_),Peliculas,[{','.join(calificaciones)}],{presupuesto},Weekday,tiempo({datetime.hour},{datetime.minute}),[{','.join(generos)}])"):
             return [i.args for i in result['Peliculas']]
+
+    def get_eventos_en_mes(self, provincia, lugar, fecha, calificaciones, presupuesto):
+        if len(calificaciones)==0:
+            return []
+        if presupuesto is None:
+            presupuesto = 'inf'
+        for result in self.prolog.query(f"eventos_en_mes(L, lugar({provincia},\"{lugar}\"), {presupuesto}, {fecha.month},{fecha.year}, [{','.join(calificaciones)}])"):
+            for i in result['L']:
+                print(str(i))
+            return [i.args for i in result['L']]
+        return []

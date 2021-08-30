@@ -8,7 +8,6 @@ class Lista_Peliculas(Toplevel):
     def __init__(self, target, cinema_title, datos):
         super().__init__(target)
         self.__parent = target
-        # self.root = Toplevel(target)
         self.title(f"Películas en [{cinema_title}]")
         self.grab_set()
         self.minsize(800, 300)
@@ -92,6 +91,5 @@ class Lista_Peliculas(Toplevel):
                       relief="solid",
                       bg="white").grid(row=index_g, column=0, sticky=NSEW)
                 generos.grid_rowconfigure(index_g, weight=1)
-
 
         self.mainloop()
