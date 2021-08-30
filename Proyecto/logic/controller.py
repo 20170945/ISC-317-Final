@@ -127,7 +127,18 @@ class Controlador:
         if presupuesto is None:
             presupuesto = 'inf'
         for result in self.prolog.query(f"eventos_en_mes(L, lugar({provincia},\"{lugar}\"), {presupuesto}, {fecha.month},{fecha.year}, [{','.join(calificaciones)}])"):
-            for i in result['L']:
-                print(str(i))
+            return [i.args for i in result['L']]
+        return []
+
+    def get_actividad_cultales_en_rango(self,fechas, presupuesto, calificaciones):
+        def parse_date(fecha):
+            return f"date({fecha.year},{fecha.month},{fecha.day})"
+        if len(calificaciones)==0:
+            return []
+        if len(fechas)==0:
+            return []
+        if presupuesto is None:
+            presupuesto = 'inf'
+        for result in self.prolog.query(f"actividad_culturales_en_rango(L,[{','.join([parse_date(fecha) for fecha in fechas])}],{presupuesto},[{','.join(calificaciones)}])"):
             return [i.args for i in result['L']]
         return []

@@ -4,6 +4,7 @@ from tkinter import ttk
 from tkinter import messagebox
 
 from logic.controller import Controlador
+from visual.ActividadesCulturalesSemanal import ActividadesCulturalesSemanal
 from visual.EventoMensual import Evento_Mensual
 from visual.Listado_Peliculas import Lista_Peliculas
 from visual.ScrollableFrame import *
@@ -618,7 +619,7 @@ class VentaPrincial:
         menubar = Menu(self.root)
         menu_addicional = Menu(menubar, tearoff=0)
         menu_semanal = Menu(menu_addicional, tearoff=0)
-        menu_semanal.add_command(label="Actividades Culturales", command=None)
+        menu_semanal.add_command(label="Actividades Culturales", command=lambda: ActividadesCulturalesSemanal(self.root,self.controller))
         menu_addicional.add_cascade(label="Semanal", menu=menu_semanal)
         menu_mensual = Menu(menu_addicional, tearoff=0)
         menu_mensual.add_command(label="Eventos", command=lambda : Evento_Mensual(self.root,self.controller))

@@ -398,11 +398,26 @@ bar("6 Grados",lugar(la_vega,"La Vega"),1300,4,Fecha,Tiempo):-
         Dia = 0 %esto esta para poder coger todos los tipos de resturante
     ).
 
-% actividad_cultural\4: nombre, lugar\2, tipo_actividad, costo
-actividad_cultural("Centro Cultural Banreservas", lugar(santo_domingo,"Santo Domingo"), "Centro cultural", 0).
-actividad_cultural("Centro Cultural de España", lugar(santo_domingo,"Santo Domingo"), "Centro cultural", 0).
-actividad_cultural("Museo del Hombre Dominicano", lugar(santo_domingo,"Santo Domingo"), "Museo", 500).
-actividad_cultural("Teatro Guloya", lugar(santo_domingo,"Santo Domingo"), "Obra de teatro", 700).
+% actividad_cultural\4: nombre, lugar\2, tipo_actividad, costo, fecha, calif
+actividad_cultural("Centro Cultural Banreservas", lugar(santo_domingo,"Santo Domingo"), "Centro cultural", 0, date(2021,8,30), 5).
+actividad_cultural("Centro Cultural de España", lugar(santo_domingo,"Santo Domingo"), "Centro cultural", 0, date(2021,8,29),4).
+actividad_cultural("Museo del Hombre Dominicano", lugar(santo_domingo,"Santo Domingo"), "Museo", 500, date(2021,8,22),3).
+actividad_cultural("Teatro Guloya", lugar(santo_domingo,"Santo Domingo"), "Obra de teatro", 700, date(2021,9,4),4).
+
+actividad_culturales_en_rango(L,Fechas,Costo,Calificacion) :-
+    setof(
+        actividad_cultural(N,L,T,C,F,R),
+        (
+            actividad_cultural(N,L,T,C,F,R),
+            (
+                Costo = inf;
+                (Costo \= inf , C =< Costo)
+            ),
+            member(F,Fechas),
+            member(R,Calificacion)
+        ),
+        L
+    ).
 
 % actividad\7 es nombre, lugar\2, tipo, costo, fecha con formato de date(Ano, Mes, Dia), timpo, calificación.
 % actividad(Nombre,Lugar,Tipo,Precio,Fecha,Tiempo,Calificacion).
@@ -410,6 +425,7 @@ actividad("El Carnaval",lugar(_, _),evento,0,date(_,2,27),_,5).
 actividad("Musik Festival",lugar(la_altagracia, "Playa Bávaro"),evento,2500,date(2021,8,20),_,5).
 actividad("Sorpresa",lugar(la_altagracia, "Playa Bávaro"),evento,1500,date(2021,8,14),_,5).
 actividad("Late-Winter Festival",lugar(la_altagracia, "Playa Bávaro"),evento,1000,date(2021,2,14),_,3).
+actividad(Nombre, Lugar, actividad_cultural, Costo, Fecha, _, Calificacion) :- actividad_cultural(Nombre, Lugar, _, Costo, Fecha, Calificacion).
 
 eventos_en_mes(L, Lugar, Costo, Mes, Year, Calificaciones) :-
     setof(
