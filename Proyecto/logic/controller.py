@@ -22,8 +22,7 @@ class Controlador:
             return defaultdict(lambda: None, {parse_prolog(str(i)): str(i) for i in result['L']})
 
     def get_lugares(self, provincia):
-        for result in self.prolog.query(
-                f"setof(X,A^B^C^D^E^F^(actividad(A,lugar({provincia},X),B,C,D,E,F);lugar({provincia},X)),L)"):
+        for result in self.prolog.query(f"setof(X,lugar({provincia},X),L)"):
             listado = [i.decode("utf-8") for i in result['L']]
             return listado
 

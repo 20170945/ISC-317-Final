@@ -5,11 +5,11 @@ from visual.ScrollableFrame import ScrollableFrame
 
 
 class Lista_Peliculas(Toplevel):
-    def __init__(self, target, datos):
+    def __init__(self, target, cinema_title, datos):
         super().__init__(target)
         self.__parent = target
         # self.root = Toplevel(target)
-        self.title("Registrar un acortador")
+        self.title(f"Películas en [{cinema_title}]")
         self.grab_set()
         self.minsize(800, 300)
 

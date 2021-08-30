@@ -406,6 +406,6 @@ actividad_cultural("Teatro Guloya", lugar(santo_domingo,"Santo Domingo"), "Obra 
 
 % actividad\7 es nombre, lugar\2, tipo, costo, fecha con formato de date(Ano, Mes, Dia), timpo, calificación.
 % actividad(Nombre,Lugar,Tipo,Precio,Fecha,Tiempo,Calificacion).
-actividad("El Carnaval Vegano",lugar(la_vega, "La Vega"),evento,0,date(_,2,27),_,5).
+actividad("El Carnaval",lugar(_, _),evento,0,date(_,2,27),_,5).
 
 tipos_de_otros(L):-setof(X,A^B^C^D^E^F^actividad(A,B,X,C,D,E,F),L).

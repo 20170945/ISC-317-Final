@@ -15,7 +15,7 @@ class VentaPrincial:
         self.root = Tk()
         self.root.title("Consulta")
         self.root.minsize(800, 600)
-        # self.__menubar()
+        self.__menubar()
         self.__provincias = self.controller.get_provincias()
         self.root.grid_rowconfigure(3, weight=1)
         self.root.grid_columnconfigure(0, weight=1)
@@ -428,6 +428,7 @@ class VentaPrincial:
         def creador_de_lambda(name):
             return lambda: Lista_Peliculas(
                 self.root,
+                name,
                 self.controller.get_peliculas_disponibles_cine(
                     name,
                     provincia,
@@ -522,7 +523,7 @@ class VentaPrincial:
                           borderwidth=1,
                           relief="solid",
                           bg="white"),
-                    Label(self.tabla_res.scrollable_frame, text=f" {row['Tipo'].title()} ", borderwidth=1,
+                    Label(self.tabla_res.scrollable_frame, text=f" {row['Tipo'].replace('_',' ').title()} ", borderwidth=1,
                           justify=CENTER,
                           relief="solid",
                           bg="white"),
@@ -589,14 +590,14 @@ class VentaPrincial:
 
     def __menubar(self):
         menubar = Menu(self.root)
-        filemenu = Menu(menubar, tearoff=0)
-        filemenu.add_command(label="Nuevo", command=None)
-        filemenu.add_command(label="Abrir", command=None)
-        filemenu.add_command(label="Guardar", command=None)
-        filemenu.add_command(label="Exportar", command=None)
-        filemenu.add_separator()
-        filemenu.add_command(label="Salir", command=self.root.quit)
-        menubar.add_cascade(label="Archivo", menu=filemenu)
+        menu_addicional = Menu(menubar, tearoff=0)
+        menu_semanal = Menu(menu_addicional, tearoff=0)
+        menu_semanal.add_command(label="Actividades Culturales", command=None)
+        menu_addicional.add_cascade(label="Semanal", menu=menu_semanal)
+        menu_mensual = Menu(menu_addicional, tearoff=0)
+        menu_mensual.add_command(label="Eventos", command=None)
+        menu_addicional.add_cascade(label="Mensual", menu=menu_mensual)
+        menubar.add_cascade(label="Consultas adicionales", menu=menu_addicional)
         self.root.config(menu=menubar)
 
     def on_closing(self):
