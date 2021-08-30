@@ -136,6 +136,200 @@ restaurante("Restaurant Le Bistro",lugar(puerto_plata, "Playa Cabarete"),frances
         Dia = 0 %esto esta para poder coger todos los tipos de resturante
     ).
 
+
+
+
+
+%------------Bares----------------
+
+% bar\4: nombre, lugar\2, costo, calificacion
+
+bar("Taringa Bar",lugar(santiago,"Santiago de los Caballeros"),1000,4,Fecha,Tiempo) :-
+    weekday(Fecha,Dia),
+    (
+        (
+            Dia=<5,
+            Dia>=1,
+            en_range_tiempo(Tiempo,tiempo(15,0),tiempo(23,0))
+        );
+        (
+            Dia>5,
+            en_range_tiempo(Tiempo,tiempo(14,0),tiempo(23,0))
+        );
+        Dia = 0 %esto esta para poder coger todos los tipos de resturante
+    ).
+
+bar("Marraya Drink",lugar(santiago,"Santiago de los Caballeros"),2000,4,Fecha,Tiempo) :-
+    weekday(Fecha,Dia),
+    (
+        (
+            Dia=<5,
+            Dia>=1,
+            en_range_tiempo(Tiempo,tiempo(15,0),tiempo(23,0))
+        );
+        (
+            Dia>5,
+            en_range_tiempo(Tiempo,tiempo(14,0),tiempo(23,0))
+        );
+        Dia = 0 %esto esta para poder coger todos los tipos de resturante
+    ).
+
+bar("Ahi-Bar",lugar(santiago,"Santiago de los Caballeros"),1000,5,Fecha,Tiempo) :-
+    weekday(Fecha,Dia),
+    (
+        (
+            Dia=<5,
+            Dia>=1,
+            en_range_tiempo(Tiempo,tiempo(15,0),tiempo(23,0))
+        );
+        (
+            Dia>5,
+            en_range_tiempo(Tiempo,tiempo(14,0),tiempo(23,0))
+        );
+        Dia = 0 %esto esta para poder coger todos los tipos de resturante
+    ).
+
+bar("Bajarrando Bar",lugar(santiago,"Santiago de los Caballeros"),700,4,Fecha,Tiempo) :-
+    weekday(Fecha,Dia),
+    (
+        (
+            Dia=<5,
+            Dia>=1,
+            en_range_tiempo(Tiempo,tiempo(15,0),tiempo(23,0))
+        );
+        (
+            Dia>5,
+            en_range_tiempo(Tiempo,tiempo(14,0),tiempo(23,0))
+        );
+        Dia = 0 %esto esta para poder coger todos los tipos de resturante
+    ).
+
+bar("La Posta Bar",lugar(santo_domingo,"Santo Domingo"),1200,5,Fecha,Tiempo):-
+    weekday(Fecha,Dia),
+    (
+        (
+            Dia=<5,
+            Dia>=1,
+            en_range_tiempo(Tiempo,tiempo(15,0),tiempo(23,0))
+        );
+        (
+            Dia>5,
+            en_range_tiempo(Tiempo,tiempo(14,0),tiempo(23,0))
+        );
+        Dia = 0 %esto esta para poder coger todos los tipos de resturante
+    ).
+
+bar("Onno's Bar",lugar(santo_domingo,"Santo Domingo"),1500,4,Fecha,Tiempo):-
+    weekday(Fecha,Dia),
+    (
+        (
+            Dia=<5,
+            Dia>=1,
+            en_range_tiempo(Tiempo,tiempo(15,0),tiempo(23,0))
+        );
+        (
+            Dia>5,
+            en_range_tiempo(Tiempo,tiempo(14,0),tiempo(23,0))
+        );
+        Dia = 0 %esto esta para poder coger todos los tipos de resturante
+    ).
+
+bar("Sabina Bar",lugar(santo_domingo,"Santo Domingo"),2000,4,Fecha,Tiempo):-
+    weekday(Fecha,Dia),
+    (
+        (
+            Dia=<5,
+            Dia>=1,
+            en_range_tiempo(Tiempo,tiempo(15,0),tiempo(23,0))
+        );
+        (
+            Dia>5,
+            en_range_tiempo(Tiempo,tiempo(14,0),tiempo(23,0))
+        );
+        Dia = 0 %esto esta para poder coger todos los tipos de resturante
+    ).
+
+bar("Merengue Club",lugar(santo_domingo,"Santo Domingo"),1000,4,Fecha,Tiempo):-
+    weekday(Fecha,Dia),
+    (
+        (
+            Dia=<5,
+            Dia>=1,
+            en_range_tiempo(Tiempo,tiempo(15,0),tiempo(23,0))
+        );
+        (
+            Dia>5,
+            en_range_tiempo(Tiempo,tiempo(14,0),tiempo(23,0))
+        );
+        Dia = 0 %esto esta para poder coger todos los tipos de resturante
+    ).
+
+bar("Cacique Bar",lugar(la_vega,"La Vega"),1300,4,Fecha,Tiempo):-
+    weekday(Fecha,Dia),
+    (
+        (
+            Dia=<5,
+            Dia>=1,
+            en_range_tiempo(Tiempo,tiempo(15,0),tiempo(23,0))
+        );
+        (
+            Dia>5,
+            en_range_tiempo(Tiempo,tiempo(14,0),tiempo(23,0))
+        );
+        Dia = 0 %esto esta para poder coger todos los tipos de resturante
+    ).
+
+bar("Gabbana Bebidas",lugar(la_vega,"La Vega"),1300,3,Fecha,Tiempo):-
+    weekday(Fecha,Dia),
+    (
+        (
+            Dia=<5,
+            Dia>=1,
+            en_range_tiempo(Tiempo,tiempo(15,0),tiempo(23,0))
+        );
+        (
+            Dia>5,
+            en_range_tiempo(Tiempo,tiempo(14,0),tiempo(23,0))
+        );
+        Dia = 0 %esto esta para poder coger todos los tipos de resturante
+    ).
+
+bar("Lite Lounge",lugar(la_vega,"La Vega"),1300,5,Fecha,Tiempo):-
+    weekday(Fecha,Dia),
+    (
+        (
+            Dia=<5,
+            Dia>=1,
+            en_range_tiempo(Tiempo,tiempo(15,0),tiempo(23,0))
+        );
+        (
+            Dia>5,
+            en_range_tiempo(Tiempo,tiempo(14,0),tiempo(23,0))
+        );
+        Dia = 0 %esto esta para poder coger todos los tipos de resturante
+    ).
+
+bar("6 Grados",lugar(la_vega,"La Vega"),1300,4,Fecha,Tiempo):-
+    weekday(Fecha,Dia),
+    (
+        (
+            Dia=<5,
+            Dia>=1,
+            en_range_tiempo(Tiempo,tiempo(15,0),tiempo(23,0))
+        );
+        (
+            Dia>5,
+            en_range_tiempo(Tiempo,tiempo(14,0),tiempo(23,0))
+        );
+        Dia = 0 %esto esta para poder coger todos los tipos de resturante
+    ).
+
+% actividad_cultural\4: nombre, lugar\2, tipo_actividad, costo
+actividad_cultural("Centro Cultural Banreservas", lugar(santo_domingo,"Santo Domingo"), "Centro cultural", 0).
+actividad_cultural("Centro Cultural de España", lugar(santo_domingo,"Santo Domingo"), "Centro cultural", 0).
+actividad_cultural("Museo del Hombre Dominicano", lugar(santo_domingo,"Santo Domingo"), "Museo", 500).
+actividad_cultural("Teatro Guloya", lugar(santo_domingo,"Santo Domingo"), "Obra de teatro", 700).
+
 % actividad\7 es nombre, lugar\2, tipo, costo, fecha con formato de date(Ano, Mes, Dia), timpo, calificación.
 % actividad(Nombre,Lugar,Tipo,Precio,Fecha,Tiempo,Calificacion).
 actividad("El Carnaval Vegano",lugar(la_vega, "La Vega"),evento,0,date(_,2,27),_,5).
