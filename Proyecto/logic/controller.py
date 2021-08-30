@@ -26,10 +26,16 @@ class Controlador:
             listado = [i.decode("utf-8") for i in result['L']]
             return listado
 
-    def __query_(self, og_query, costo, tipos, calificaciones):
+    def __query_(self, og_query, costo, tipos, calificaciones, porcentaje, min, max):
         query = og_query
         if costo is not None:
             query += f",Costo=<{costo}"
+        if max is not None:
+            query += f",Costo=<{max}"
+        if min is not None:
+            query += f",Costo>={min}"
+        if porcentaje is not None and costo is not None:
+            query += f",Costo=<{(int(costo) * porcentaje)/100}"
         if len(tipos) > 0:
             query += f",member(Tipo,[{','.join(tipos)}])"
         else:
@@ -56,21 +62,21 @@ class Controlador:
             return []
         return [i for i in self.prolog.query(query)]
 
-    def get_actividades(self, provincia, lugar, datetime, costo, tipos, calificaciones):
+    def get_actividades(self, provincia, lugar, datetime, costo, tipos, calificaciones, porcentaje, min, max):
         if datetime is None:
             return []
         query = f"actividad(Nombre,lugar({provincia},\"{lugar}\"),Tipo,Costo,date({datetime.year},{datetime.month},{datetime.day}),tiempo({datetime.hour},{datetime.minute}),Calificacion)"
-        return self.__query_(query, costo, tipos, calificaciones)
+        return self.__query_(query, costo, tipos, calificaciones, porcentaje, min, max)
 
     def get_otro_tipos(self):
         for result in self.prolog.query("tipos_de_otros(L)"):
             return [str(i) for i in result['L']]
 
-    def get_restaurantes(self, provincia, lugar, datetime, costo, tipos, calificaciones):
+    def get_restaurantes(self, provincia, lugar, datetime, costo, tipos, calificaciones, porcentaje, min, max):
         if datetime is None:
             return []
         query = f"restaurante(Nombre, lugar({provincia},\"{lugar}\"), Tipo, Costo, date({datetime.year},{datetime.month},{datetime.day}), tiempo({datetime.hour},{datetime.minute}), Calificacion)"
-        return self.__query_(query, costo, tipos, calificaciones)
+        return self.__query_(query, costo, tipos, calificaciones, porcentaje, min, max)
 
     def get_bares(self, ciudad, lugar, datetime, costo, calificaciones, porcentaje, min, max):
         if datetime is None:

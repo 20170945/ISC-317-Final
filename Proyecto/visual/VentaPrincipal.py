@@ -356,10 +356,10 @@ class VentaPrincial:
 
         vcmd = (self.root.register(lambda P: (str.isdigit(P) or P == "")), '%P')
 
-        min_var = StringVar()
-        self.__min = Entry(frame_min, validate='all', textvariable=min_var,
+        self.__min_var = StringVar()
+        self.__min = Entry(frame_min, validate='all', textvariable=self.__min_var,
                            validatecommand=vcmd, width=7, justify=RIGHT)
-        min_var.trace_add("write", lambda a, b, c: self.__on_change())
+        self.__min_var.trace_add("write", lambda a, b, c: self.__on_change())
 
         self.__min.grid(row=0, column=1, sticky=W)
 
@@ -385,18 +385,21 @@ class VentaPrincial:
         Label(frame_porcentaje, text="Porcentaje:").grid(row=0, column=0, sticky=W)
 
         vcmd = (self.root.register(lambda P: (str.isdigit(P) or P == "")), '%P')
-        porc_var = StringVar()
+        self.__porc_var = StringVar()
 
         self.__porc = ttk.Spinbox(
             frame_porcentaje,
             from_=0,
             to=100,
-            textvariable=porc_var,
+            textvariable=self.__porc_var,
             wrap=True,
             validate=ALL,
             validatecommand=vcmd,
             justify=RIGHT
         )
+
+        self.__porc_var.trace_add("write", lambda a, b, c: self.__on_change())
+
         self.__porc.grid(row=0, column=1, sticky=W)
 
 
@@ -461,9 +464,20 @@ class VentaPrincial:
         fechatiempo = datetime.datetime(fecha.year, fecha.month, fecha.day, tiempo.hora, tiempo.minuto)
         costo = self.__presupuesto.get()
         tipos = set([i.get() for i in self.__tipos_valor if i.get() != ""])
+        max = self.__max.get()
+        min = self.__min.get()
+        porcentaje = self.__porc.get()
         calificaciones = set([i.get() for i in self.__califs_valor if i.get() != ""])
         if len(costo) == 0:
             costo = None
+        if len(max) == 0:
+            max = None
+        if len(min) == 0:
+            min = None
+        if len(porcentaje) == 0 or int(porcentaje) == 0:
+            porcentaje = None
+        else:
+            porcentaje = int(porcentaje)
         provincia = self.__provincias[self.__current_provincia.get()]
         for row in self.__table_data:
             for col in row:
@@ -472,7 +486,7 @@ class VentaPrincial:
         if provincia is not None:
             for index, row in enumerate(
                     self.controller.get_actividades(provincia, self.__current_place.get(), fechatiempo,
-                                                    costo, tipos, calificaciones), start=1):
+                                                    costo, tipos, calificaciones, porcentaje, min, max), start=1):
                 h = row['Nombre']
                 if type(h) is bytes:
                     h = h.decode("utf-8")
@@ -501,9 +515,20 @@ class VentaPrincial:
         fechatiempo = datetime.datetime(fecha.year, fecha.month, fecha.day, tiempo.hora, tiempo.minuto)
         costo = self.__presupuesto.get()
         tipos = set([i.get() for i in self.__tipos_res_valor if i.get() != ""])
+        max = self.__max.get()
+        min = self.__min.get()
+        porcentaje = self.__porc.get()
         calificaciones = set([i.get() for i in self.__calif_rest if i.get() != ""])
         if len(costo) == 0:
             costo = None
+        if len(max) == 0:
+            max = None
+        if len(min) == 0:
+            min = None
+        if len(porcentaje) == 0 or int(porcentaje) == 0:
+            porcentaje = None
+        else:
+            porcentaje = int(porcentaje)
         provincia = self.__provincias[self.__current_provincia.get()]
         for row in self.__table_data:
             for col in row:
@@ -512,7 +537,7 @@ class VentaPrincial:
         if provincia is not None:
             for index, row in enumerate(
                     self.controller.get_restaurantes(provincia, self.__current_place.get(), fechatiempo,
-                                                     costo, tipos, calificaciones), start=1):
+                                                     costo, tipos, calificaciones, porcentaje, min, max), start=1):
                 h = row['Nombre']
                 if type(h) is bytes:
                     h = h.decode("utf-8")
