@@ -371,7 +371,7 @@ class VentaPrincial:
         # vcmd = (self.root.register(lambda P: (str.isdigit(P) or P == "")), '%P')
 
         self.__max_var = StringVar()
-        self.__max = Entry(frame_max, validate='all', textvariable=max_var,
+        self.__max = Entry(frame_max, validate='all', textvariable=self.__max_var,
                                    validatecommand=vcmd, width=7, justify=RIGHT)
         self.__max_var.trace_add("write", call_on_change)
 
