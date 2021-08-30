@@ -107,10 +107,15 @@ cine("Cinema Boreal",lugar(santo_domingo, "Zona Colonial"), 4).
 % cerrado : cine("Cine Lido",lugar(santo_domingo, "Zona Colonial"), 3).
 % pelicula: pelicula\3 Titulo, calificacion y generos
 
+cine_pelicula(cine("Caribbean Cinemas (Colinas Mall)",lugar(santiago,"Santiago de los Caballeros"), 4),Pelicula):-
+    member(Pelicula, [
+        pelicula("Joke",15,1,[1,2,3,4,5,6,7],[tiempo(15,0),tiempo(17,0)],tiempo(2,0),[comedia, documental])
+    ]).
+
 cine_pelicula(cine("Cinema Boreal",lugar(santo_domingo, "Zona Colonial"), 4),Pelicula):-
     member(Pelicula, [
-        pelicula("hola",500,3,[1,3,5],[tiempo(15,0),tiempo(17,0)],tiempo(2,0),[a]),
-        pelicula("Zombie Ride",500,3,[1,3,5],[tiempo(15,0),tiempo(17,0)],tiempo(2,0),[terror])
+        pelicula("Planet Earth",1000,5,[1,3,5],[tiempo(15,0),tiempo(17,0)],tiempo(2,0),[natulareza, documental]),
+        pelicula("Thriller",500,3,[1,3,5],[tiempo(15,0),tiempo(17,0)],tiempo(2,0),[terror])
     ]).
 
 
