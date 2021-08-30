@@ -79,14 +79,89 @@ lugar(santo_domingo, "Zona Colonial").
 weekday([],0):-!.
 weekday(Fecha,Dia):- day_of_the_week(Fecha,Dia).
 
+minutos_en_total(tiempo(Hora,Minutos),Total) :- Total is Hora*60+Minutos.
 
 en_range_tiempo([],_,_) :- !.%esto es para prevenir un bug en la extracción de lugares.
-en_range_tiempo(tiempo(HoraActual,MinActual),tiempo(HoraInicial,MinInicial),tiempo(HoraFinal,MinFinal)) :-
-    ValorActual is HoraActual*60+MinActual,
-    ValorInicial is HoraInicial*60+MinInicial,
-    ValorFinal is HoraFinal*60+MinFinal,
+en_range_tiempo(Actual,Inicial,Final) :-
+    minutos_en_total(Actual, ValorActual),
+    minutos_en_total(Inicial, ValorInicial),
+    minutos_en_total(Final, ValorFinal),
     ValorInicial=<ValorActual,
     ValorActual=<ValorFinal, !.
+
+antes_de_tiempo(Antes,Despues):-
+    minutos_en_total(Antes, ValorAntes),
+    minutos_en_total(Despues, ValorDespues),
+    ValorAntes =< ValorDespues.
+
+horario_disponible(Actual, [H|_]) :-
+    antes_de_tiempo(Actual,H),!.
+horario_disponible(Actual, [_|T]) :- horario_disponible(Actual, T).
+
+comparten([H|_],Otra):- member(H,Otra), !.
+comparten([H|T],Otra):- comparten(T,Otra).
+
+
+% cine y peliculas
+cine("Cinema Boreal",lugar(santo_domingo, "Zona Colonial"), 4).
+% cerrado : cine("Cine Lido",lugar(santo_domingo, "Zona Colonial"), 3).
+% pelicula: pelicula\3 Titulo, calificacion y generos
+
+cine_pelicula(cine("Cinema Boreal",lugar(santo_domingo, "Zona Colonial"), 4),Pelicula):-
+    member(Pelicula, [
+        pelicula("hola",500,3,[1,3,5],[tiempo(15,0),tiempo(17,0)],tiempo(2,0),[a]),
+        pelicula("Zombie Ride",500,3,[1,3,5],[tiempo(15,0),tiempo(17,0)],tiempo(2,0),[terror])
+    ]).
+
+
+cine_pelicula(cine("The Colonial Gate 4D Cinema",lugar(santo_domingo, "Zona Colonial"), 5),Pelicula):-
+    member(Pelicula, [
+        pelicula("The Battle of Santo Domingo",500,3,[1,3,5],[tiempo(15,0),tiempo(17,0)],tiempo(1,50), [histórico]),
+        pelicula("The Adventure of Ali Baba: JewelQuest",300,4,[2,4,6],[tiempo(14,0),tiempo(18,0)],tiempo(2,10),[aventura]),
+        pelicula("The Great Wall of China",300,1,[1,3,5],[tiempo(14,0),tiempo(18,30)],tiempo(2,0),[aventura, oriental]),
+        pelicula("Pirates 7D",600,5,[2,4,6],[tiempo(15,0),tiempo(19,0)],tiempo(2,30),[piratas, aventura]),
+        pelicula("Toy Ride",700,3,[1,3,5],[tiempo(14,30),tiempo(17,45)],tiempo(2,0),[aventura]),
+        pelicula("Planetarium",700,4,[2,4,6],[tiempo(15,15),tiempo(17,0)],tiempo(3,0),[ciencia_fricción]),
+        pelicula("Dracula 4D",650,2,[1,3,5],[tiempo(2,30)],tiempo(4,0),[terror]),
+        pelicula("Journey to the West",500,1,[2,4,6],[tiempo(11,0)],tiempo(1,52),[aventura]),
+        pelicula("Asylum",400,5,[1,3,5],[tiempo(15,0),tiempo(17,0)],tiempo(2,5),[terror]),
+        pelicula("Dino Adventure",650,4,[2,4,6],[tiempo(16,0)],tiempo(2,50),[aventura]),
+        pelicula("Afterlife",500,3,[1,3,5],[tiempo(16,30)],tiempo(4,0),[horror]),
+        pelicula("Zombie Ride",600,5,[2,4,6],[tiempo(14,0),tiempo(16,0)],tiempo(1,32),[terror]),
+        pelicula("Alien Zoo",500,4,[1,3,5],[tiempo(14,0),tiempo(16,0)],tiempo(1,20),[ciencia_fricción]),
+        pelicula("The Chase",200,2,[2,4,6],[tiempo(14,30),tiempo(16,30)],tiempo(1,11),[aventura]),
+        pelicula("Sleigh Ride",400,3,[1,3,5],[tiempo(14,0),tiempo(16,0)],tiempo(1,23),[aventura, navideño])
+    ]).
+
+cines(L) :- setof(X,A^cine_pelicula(X,A),L).
+cines(L, Lugar) :- setof(cine(A,Lugar,C),D^cine_pelicula(cine(A,Lugar,C),D),L).
+generos_de_peliculas(L) :- setof(X,A^G^D^H^N^C^P^W^ (cine_pelicula(A,pelicula(N,P,C,W,H,D,G)),member(X,G)),L).
+
+generos_de_cine(Cine,L) :- setof(X,G^N^C^D^H^P^W^ (cine_pelicula(Cine,pelicula(N,P,C,W,H,D,G)),member(X,G)),L).
+
+peliculas_de_cine(Cine, Peliculas,Calificaciones, Presupuesto, Weekday, Hora, Generos) :-
+    setof(
+        pelicula(N,P,C,W,H,D,G),
+        (
+            cine_pelicula(Cine,pelicula(N,P,C,W,H,D,G)),
+            comparten(G, Generos),
+            horario_disponible(Hora, H),
+            member(Weekday, W),
+            member(C,Calificaciones),
+            (
+                Presupuesto = inf ;
+                Presupuesto >= P
+            )
+        ),
+        Peliculas
+    ).
+
+cines_disponibles(L, Lugar, Calificaciones, Presupuesto, Dia, Hora, TargetGeneros) :-
+    setof(cine(A,Lugar,C), Generos^ (generos_de_cine(cine(A,Lugar,C),Generos), comparten(Generos,TargetGeneros)),Cines),
+    weekday(Dia, Weekday),
+    setof(Cine,A^B^ (member(Cine, Cines),peliculas_de_cine(Cine,[A|B], Calificaciones, Presupuesto, Weekday, Hora, TargetGeneros)),L).
+
+
 
 
 
@@ -135,8 +210,7 @@ restaurante("Restaurant Le Bistro",lugar(puerto_plata, "Playa Cabarete"),frances
         );
         Dia = 0 %esto esta para poder coger todos los tipos de resturante
     ).
-
-
+tipos_de_restaurantes(L):-setof(X,A^B^C^D^E^restaurante(A,B,X,C,D,[],E),L).
 
 
 
@@ -145,7 +219,7 @@ restaurante("Restaurant Le Bistro",lugar(puerto_plata, "Playa Cabarete"),frances
 % bar\4: nombre, lugar\2, costo, calificacion
 
 bar("Taringa Bar",lugar(santiago,"Santiago de los Caballeros"),1000,4,Fecha,Tiempo) :-
-    weekday(Fecha,Dia),
+    weekday(Fecha, Dia),
     (
         (
             Dia=<5,
@@ -333,3 +407,5 @@ actividad_cultural("Teatro Guloya", lugar(santo_domingo,"Santo Domingo"), "Obra 
 % actividad\7 es nombre, lugar\2, tipo, costo, fecha con formato de date(Ano, Mes, Dia), timpo, calificación.
 % actividad(Nombre,Lugar,Tipo,Precio,Fecha,Tiempo,Calificacion).
 actividad("El Carnaval Vegano",lugar(la_vega, "La Vega"),evento,0,date(_,2,27),_,5).
+
+tipos_de_otros(L):-setof(X,A^B^C^D^E^F^actividad(A,B,X,C,D,E,F),L).
